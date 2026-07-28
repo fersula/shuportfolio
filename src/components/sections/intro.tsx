@@ -1,0 +1,239 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { EASE } from "@/lib/motion";
+import { gsap } from "@/lib/gsap";
+import { BorderGlow } from "@/components/ui/border-glow";
+
+type Tab = {
+  key: string;
+  label: string;
+  text: string;
+};
+
+const TABS: Tab[] = [
+  {
+    key: "anyone",
+    label: "For anyone",
+    text: "I design and build AI-powered experiences that turn emerging technologies into something people can actually feel, use, and understand.",
+  },
+  {
+    key: "founders",
+    label: "founders",
+    text: "I help turn ambiguous ideas into sharp product hypotheses, then make them tangible through fast, testable prototypes.",
+  },
+  {
+    key: "recruiters",
+    label: "recruiters",
+    text: "5+ years across AI, UX, prototyping and emerging technology projects. Strong in product thinking, interaction design, and AI-assisted building.",
+  },
+  {
+    key: "designers",
+    label: "designers",
+    text: "I care deeply about the human side of technology — and about translating abstract ideas into clear product behavior and interactions.",
+  },
+  {
+    key: "product-managers",
+    label: "product managers",
+    text: "My strength is identifying the real problem behind the brief, framing solution hypotheses, and shaping product behavior from insight to prototype.",
+  },
+  {
+    key: "engineers",
+    label: "engineers",
+    text: "I work at the boundary of product, design, and implementation — defining system logic, interaction flows, and using AI-assisted tools to quickly build and test ideas.",
+  },
+];
+
+/**
+ * The bio paragraph is rendered twice, stacked: a dim base copy (70% white)
+ * and a bright copy (100% white) clipped to a soft circle that follows the
+ * cursor — a torchlight over the text, lerped + eased every frame the same
+ * way the rest of the site's cursor-driven reveals work.
+ */
+function SpotlightText({ text }: { text: string }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const overlayRef = useRef<HTMLParagraphElement>(null);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    const overlay = overlayRef.current;
+    if (!el || !overlay) return;
+
+    const current = { x: 0.5, y: 0.4, r: 0 };
+    const target = { x: 0.5, y: 0.4, active: false };
+    let raf = 0;
+
+    function onMove(e: PointerEvent) {
+      const rect = el!.getBoundingClientRect();
+      target.x = (e.clientX - rect.left) / rect.width;
+      target.y = (e.clientY - rect.top) / rect.height;
+      target.active = true;
+    }
+    function onLeave() {
+      target.active = false;
+    }
+    function frame() {
+      const rect = el!.getBoundingClientRect();
+      current.x += (target.x - current.x) * 0.18;
+      current.y += (target.y - current.y) * 0.18;
+      current.r += ((target.active ? 130 : 0) - current.r) * 0.12;
+      overlay!.style.setProperty("--spot-x", `${current.x * rect.width}px`);
+      overlay!.style.setProperty("--spot-y", `${current.y * rect.height}px`);
+      overlay!.style.setProperty("--spot-r", `${current.r}px`);
+      raf = requestAnimationFrame(frame);
+    }
+
+    el.addEventListener("pointermove", onMove, { passive: true });
+    el.addEventListener("pointerleave", onLeave, { passive: true });
+    raf = requestAnimationFrame(frame);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      el.removeEventListener("pointermove", onMove);
+      el.removeEventListener("pointerleave", onLeave);
+    };
+  }, []);
+
+  return (
+    <div ref={containerRef} className="relative">
+      <p
+        className="font-sans text-[24px] leading-relaxed"
+        style={{ color: "rgba(255,255,255,0.7)" }}
+      >
+        {text}
+      </p>
+      <p
+        ref={overlayRef}
+        aria-hidden
+        className="pointer-events-none absolute inset-0 font-sans text-[24px] leading-relaxed"
+        style={{
+          color: "#ffffff",
+          maskImage:
+            "radial-gradient(circle var(--spot-r, 0px) at var(--spot-x, 50%) var(--spot-y, 40%), black 0%, transparent 100%)",
+          WebkitMaskImage:
+            "radial-gradient(circle var(--spot-r, 0px) at var(--spot-x, 50%) var(--spot-y, 40%), black 0%, transparent 100%)",
+        }}
+      >
+        {text}
+      </p>
+    </div>
+  );
+}
+
+export function Intro() {
+  const [active, setActive] = useState(TABS[0].key);
+  const activeTab = TABS.find((t) => t.key === active) ?? TABS[0];
+  const cardRef = useRef<HTMLDivElement>(null);
+  const teaserRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const ctx = gsap.context(() => {
+      [cardRef.current, teaserRef.current].forEach((el) => {
+        if (!el) return;
+        gsap.fromTo(
+          el,
+          { opacity: 0, y: 28 },
+          {
+            opacity: 1,
+            y: 0,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: el,
+              start: "top 88%",
+              end: "top 55%",
+              scrub: true,
+            },
+          }
+        );
+      });
+    });
+
+    return () => ctx.revert();
+  }, []);
+
+  return (
+    <section id="intro" className="relative bg-ink">
+      <div className="flex min-h-svh flex-col justify-center px-gutter py-section lg:pl-[380px] lg:pr-gutter">
+        <div ref={cardRef} className="max-w-2xl">
+          <BorderGlow
+            borderRadius={24}
+            backgroundColor="#131417"
+            glowColor="14 55 58"
+            glowRadius={36}
+            glowIntensity={1}
+            coneSpread={25}
+            edgeSensitivity={30}
+            colors={["#10b981", "#4d85d7", "#d0634d"]}
+          >
+            <div className="p-8 md:p-10">
+              <div className="flex flex-col gap-10 md:flex-row md:items-center">
+                <nav className="flex shrink-0 flex-col gap-4">
+                  {TABS.map((tab) => (
+                    <button
+                      key={tab.key}
+                      type="button"
+                      onClick={() => setActive(tab.key)}
+                      className={`text-left font-mono text-sm transition-colors duration-300 ${
+                        active === tab.key
+                          ? "text-paper"
+                          : "text-paper-dim/60 hover:text-paper-dim"
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </nav>
+
+                <div className="flex-1">
+                  <video
+                    src="/emo.mp4"
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="mb-4 h-[100px] w-[100px] rounded-full object-cover"
+                  />
+                  <div className="relative">
+                    {/* invisible sizer, pinned to the first tab's text — keeps the
+                        card's height fixed instead of hugging whichever tab is active */}
+                    <p aria-hidden className="invisible font-sans text-[24px] leading-relaxed">
+                      {TABS[0].text}
+                    </p>
+                    <div className="absolute inset-0">
+                      <AnimatePresence mode="wait">
+                        <motion.div
+                          key={active}
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -8 }}
+                          transition={{ duration: 0.35, ease: EASE.settle }}
+                        >
+                          <SpotlightText text={activeTab.text} />
+                        </motion.div>
+                      </AnimatePresence>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </BorderGlow>
+        </div>
+      </div>
+
+      <div className="flex min-h-svh flex-col justify-center px-gutter py-section lg:pl-[380px] lg:pr-gutter">
+        <div id="featured-works-teaser" ref={teaserRef} className="max-w-2xl">
+          <h2 className="font-mono text-base tracking-[0.04em] text-blue md:text-lg">
+            Featured Works
+          </h2>
+          <p className="mt-5 font-sans text-[24px] leading-relaxed text-paper">
+            My projects may span automotive, emotion AI, culture and travel. But
+            they all explore different forms of human connection.
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}

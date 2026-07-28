@@ -1,26 +1,284 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* ---- color: surfaces ---- */
+  --color-ink: #050505;
+  --color-ink-soft: #0c0d0f;
+  --color-ink-raised: #131417;
+
+  /* ---- color: foreground ---- */
+  --color-paper: #f3f1ea;
+  --color-paper-dim: #a8a6a0;
+  --color-paper-faint: #59584f;
+
+  /* ---- color: spectrum (grainient palette) ---- */
+  /* emerald — technology, signal */
+  --color-emerald: #10b981;
+  /* violet-deep — the dark between */
+  --color-violet-deep: #120d26;
+  /* gold — human warmth */
+  --color-gold: #eab308;
+  /* blue — Manifesto heading accent */
+  --color-blue: #4d85d7;
+  /* terracotta — index sidebar accent */
+  --color-terracotta: #d0634d;
+  /* turquoise — Featured Works "Featured Work" badge */
+  --color-turquoise: #89d3c5;
+  /* lavender — Refraction Lab "Experiments" node accent */
+  --color-lavender: #978aee;
+  /* mint — Refraction Lab "Observations" node accent */
+  --color-mint: #6bd7c3;
+
+  /* ---- spacing: hero / section rhythm ---- */
+  --spacing-gutter: clamp(1.5rem, 5vw, 4rem);
+  --spacing-hero-y: clamp(2rem, 8vh, 6rem);
+  --spacing-section: clamp(4rem, 12vh, 8rem);
+
+  /* ---- motion: easing curves ---- */
+  --ease-prism: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-refract: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-drift: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-settle: cubic-bezier(0.33, 1, 0.68, 1);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  /* surfaces */
+  --color-ink: var(--color-ink);
+  --color-ink-soft: var(--color-ink-soft);
+  --color-ink-raised: var(--color-ink-raised);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* foreground */
+  --color-paper: var(--color-paper);
+  --color-paper-dim: var(--color-paper-dim);
+  --color-paper-faint: var(--color-paper-faint);
+
+  /* spectrum */
+  --color-emerald: var(--color-emerald);
+  --color-violet-deep: var(--color-violet-deep);
+  --color-gold: var(--color-gold);
+  --color-blue: var(--color-blue);
+  --color-terracotta: var(--color-terracotta);
+  --color-turquoise: var(--color-turquoise);
+  --color-lavender: var(--color-lavender);
+  --color-mint: var(--color-mint);
+
+  /* type — locked system: mono = titles/labels, grotesk = floating words,
+     sans = body reading text */
+  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-grotesk: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+
+  /* spacing */
+  --spacing-gutter: var(--spacing-gutter);
+  --spacing-hero-y: var(--spacing-hero-y);
+  --spacing-section: var(--spacing-section);
+
+  /* easing */
+  --ease-prism: var(--ease-prism);
+  --ease-refract: var(--ease-refract);
+  --ease-drift: var(--ease-drift);
+  --ease-settle: var(--ease-settle);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-emerald) 35%, transparent);
+  color: var(--color-paper);
+}
+
+/* fine photographic grain, laid over the whole scene */
+.grain-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.35;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+}
+
+/* Floating words: each word's depth-layer look (opacity / blur / size)
+   is set inline; when the cursor comes near, .is-focus lifts the word
+   out of its layer — solid white, sharp, slightly enlarged — and CSS
+   transitions ease it back down when the cursor leaves. */
+.word-node {
+  transition:
+    opacity 0.4s var(--ease-settle),
+    filter 0.4s var(--ease-settle),
+    transform 0.4s var(--ease-settle),
+    color 0.4s var(--ease-settle);
+  will-change: opacity, filter, transform;
+}
+.word-node.is-focus {
+  opacity: 1 !important;
+  filter: none !important;
+  color: #ffffff;
+  transform: scale(1.08);
+}
+
+/* Featured Works: the Related-card pair under a section only expands once
+   that section has scroll focus — grid-template-rows 0fr→1fr is a pure-CSS
+   accordion that needs no JS height measurement (the inner wrapper's
+   min-height: 0 is what lets the row collapse past its content height). */
+.related-accordion {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  overflow: hidden;
+  transition:
+    grid-template-rows 0.6s var(--ease-refract),
+    opacity 0.4s var(--ease-refract);
+}
+.related-accordion.is-open {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+.related-accordion > div {
+  min-height: 0;
+}
+
+/* Index sidebar rows: --effect (0–1) is written every frame by a rAF loop
+   in index-sidebar.tsx — exponentially eased toward pointer-proximity or
+   active-state, whichever is higher — so color, marker size and shift all
+   move in lockstep without fighting a separate CSS transition. */
+.sidebar-row {
+  --effect: 0;
+}
+.sidebar-row .sidebar-content {
+  transform: translateX(calc(var(--effect) * 10px));
+}
+.sidebar-row .sidebar-label {
+  color: color-mix(
+    in oklab,
+    var(--color-paper-dim) calc((1 - var(--effect)) * 100%),
+    var(--color-terracotta) calc(var(--effect) * 100%)
+  );
+}
+.sidebar-row .sidebar-index {
+  color: color-mix(
+    in oklab,
+    var(--color-paper-faint) calc((1 - var(--effect)) * 100%),
+    var(--color-terracotta) calc(var(--effect) * 100%)
+  );
+}
+.sidebar-row .sidebar-marker {
+  width: calc(14px + var(--effect) * 18px);
+  opacity: calc(0.3 + var(--effect) * 0.7);
+  background: color-mix(
+    in oklab,
+    var(--color-paper-faint) calc((1 - var(--effect)) * 100%),
+    var(--color-terracotta) calc(var(--effect) * 100%)
+  );
+}
+
+/* Option Wheel: a vertically-curved list of category labels. --ow-p
+   (0→1, distance-from-center) is written every frame by the wheel's own
+   rAF loop directly onto each item's style, and drives color via the
+   same color-mix pattern used by the sidebar rows above. */
+.option-wheel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  outline: none;
+}
+.option-wheel--dragging {
+  cursor: grabbing;
+}
+.option-wheel__item {
+  position: absolute;
+  top: 50%;
+  left: var(--ow-inset);
+  white-space: nowrap;
+  font-family: var(--font-grotesk);
+  font-size: var(--ow-font-size);
+  line-height: 1;
+  font-weight: 400;
+  transform-origin: left center;
+  cursor: pointer;
+  will-change: transform, opacity, filter;
+  color: color-mix(
+    in srgb,
+    var(--ow-active-color) calc(var(--ow-p, 0) * 100%),
+    var(--ow-text-color)
+  );
+}
+.option-wheel--right .option-wheel__item {
+  left: auto;
+  right: var(--ow-inset);
+  transform-origin: right center;
+}
+.option-wheel__item--selected {
+  font-weight: 500;
+}
+
+/* Fluid glass cursor: a small blob that follows the pointer everywhere on
+   the page. Base layer is a plain frosted backdrop-blur (works in every
+   engine); the @supports block layers an SVG feDisplacementMap onto
+   backdrop-filter so Chromium additionally refracts/warps whatever sits
+   beneath the blob — Safari/Firefox don't support filter references inside
+   backdrop-filter, so they silently keep the plain-blur look instead of
+   erroring. Blur and displacement are kept low: text beneath the blob
+   needs to stay legible with only a mild ripple, not turn to noise.
+   Position is written every frame by a rAF loop in fluid-glass-cursor.tsx;
+   the border-radius wobble is pure CSS. */
+.fluid-glass-cursor {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+}
+.fluid-glass-cursor__defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+.fluid-glass-cursor__blob {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 140px;
+  height: 140px;
+  opacity: 0;
+  border-radius: 42% 58% 63% 37% / 41% 44% 56% 59%;
+  animation: fluid-glass-wobble 7s ease-in-out infinite;
+  backdrop-filter: blur(3px) saturate(1.15) brightness(1.04);
+  -webkit-backdrop-filter: blur(3px) saturate(1.15) brightness(1.04);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.14),
+    inset 0 8px 20px rgba(255, 255, 255, 0.08),
+    0 8px 30px rgba(0, 0, 0, 0.35);
+  will-change: transform, opacity;
+}
+@supports (backdrop-filter: url(#a)) {
+  .fluid-glass-cursor__blob {
+    backdrop-filter: blur(1px) url(#fluid-glass-distortion) saturate(1.15) brightness(1.04);
+  }
+}
+@keyframes fluid-glass-wobble {
+  0%,
+  100% {
+    border-radius: 42% 58% 63% 37% / 41% 44% 56% 59%;
+  }
+  33% {
+    border-radius: 58% 42% 39% 61% / 55% 62% 38% 45%;
+  }
+  66% {
+    border-radius: 48% 52% 57% 43% / 60% 35% 65% 40%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

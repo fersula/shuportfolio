@@ -1,0 +1,269 @@
+/* Shu's Refraction Lab — node markers, starfield ambience, connection
+   lines. Kept as its own scoped file (same pattern as border-glow.css)
+   rather than folded into globals.css, since it's a large, self-contained
+   set of keyframes only this section uses. */
+
+/* ---- starfield / installation backdrop ---- */
+.lab-field {
+  position: relative;
+  overflow: hidden;
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: radial-gradient(
+      ellipse 70% 55% at 22% 28%,
+      color-mix(in srgb, var(--color-blue) 14%, transparent) 0%,
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse 60% 50% at 78% 66%,
+      color-mix(in srgb, var(--color-lavender) 10%, transparent) 0%,
+      transparent 62%
+    ),
+    radial-gradient(
+      ellipse 55% 45% at 55% 85%,
+      color-mix(in srgb, var(--color-emerald) 9%, transparent) 0%,
+      transparent 60%
+    ),
+    var(--color-ink);
+}
+
+/* WebGL point cloud (particles.tsx) drifting behind the star dots and
+   nodes — the nebula reading of "scattered fragments" the rest of the
+   site's prism/refraction metaphor is built on. Never intercepts
+   pointer events: it's pure ambience, sitting under the node field's
+   own pointer-driven parallax and click targets. */
+.lab-field__nebula {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.lab-field__stars {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image: radial-gradient(1px 1px at 12% 18%, rgba(255, 255, 255, 0.7) 50%, transparent 51%),
+    radial-gradient(1px 1px at 32% 62%, rgba(255, 255, 255, 0.5) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 58% 24%, rgba(255, 255, 255, 0.6) 50%, transparent 51%),
+    radial-gradient(1px 1px at 71% 48%, rgba(255, 255, 255, 0.45) 50%, transparent 51%),
+    radial-gradient(1px 1px at 85% 82%, rgba(255, 255, 255, 0.6) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 44% 90%, rgba(255, 255, 255, 0.4) 50%, transparent 51%),
+    radial-gradient(1px 1px at 6% 78%, rgba(255, 255, 255, 0.5) 50%, transparent 51%),
+    radial-gradient(1px 1px at 93% 30%, rgba(255, 255, 255, 0.45) 50%, transparent 51%);
+  background-repeat: no-repeat;
+}
+
+/* ---- node markers ---- */
+.lab-node {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: opacity 0.5s var(--ease-settle);
+  will-change: transform;
+}
+.lab-node.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+.lab-node.is-dimmed {
+  opacity: 0.18;
+}
+
+.lab-marker {
+  position: relative;
+  display: inline-flex;
+  width: var(--lab-size, 14px);
+  height: var(--lab-size, 14px);
+  flex-shrink: 0;
+  transition: transform 0.5s var(--ease-settle);
+}
+.lab-node:hover .lab-marker,
+.lab-node:focus-visible .lab-marker,
+.lab-node.is-active .lab-marker {
+  transform: scale(1.45);
+}
+
+.lab-marker__glow {
+  position: absolute;
+  inset: calc(var(--lab-size, 14px) * -1.3);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--lab-color) 45%, transparent) 0%,
+    transparent 72%
+  );
+  filter: blur(2.5px);
+  pointer-events: none;
+}
+
+.lab-marker__dot {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--lab-color);
+  box-shadow: 0 0 6px 1px color-mix(in srgb, var(--lab-color) 85%, transparent);
+}
+
+.lab-marker__diamond-wrap {
+  position: absolute;
+  inset: 0;
+  animation: lab-bob 3.2s ease-in-out infinite;
+}
+.lab-marker__diamond {
+  position: absolute;
+  inset: 15%;
+  transform: rotate(45deg);
+  background: var(--lab-color);
+  box-shadow: 0 0 6px 1px color-mix(in srgb, var(--lab-color) 85%, transparent);
+}
+
+.lab-marker__ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid var(--lab-color);
+  box-shadow: 0 0 8px 1px color-mix(in srgb, var(--lab-color) 55%, transparent);
+  animation: lab-pulse 3.8s ease-in-out infinite;
+}
+
+.lab-marker__tri {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 0;
+  height: 0;
+  border-left: calc(var(--lab-size, 14px) * 0.42) solid transparent;
+  border-right: calc(var(--lab-size, 14px) * 0.42) solid transparent;
+  border-bottom: calc(var(--lab-size, 14px) * 0.75) solid var(--lab-color);
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--lab-color) 75%, transparent));
+  animation: lab-flicker 2.8s ease-in-out infinite;
+}
+
+@keyframes lab-flicker {
+  0%,
+  100% {
+    opacity: 0.32;
+  }
+  18% {
+    opacity: 0.9;
+  }
+  34% {
+    opacity: 0.4;
+  }
+  55% {
+    opacity: 1;
+  }
+  72% {
+    opacity: 0.3;
+  }
+  88% {
+    opacity: 0.75;
+  }
+}
+@keyframes lab-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(1.22);
+    opacity: 1;
+  }
+}
+@keyframes lab-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+/* ---- floating label + hover insight ---- */
+.lab-node__label {
+  margin-left: 10px;
+  white-space: nowrap;
+  font-family: var(--font-grotesk);
+  color: var(--color-paper-dim);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.85);
+  transition:
+    color 0.4s var(--ease-settle),
+    transform 0.4s var(--ease-settle);
+}
+.lab-node:hover .lab-node__label,
+.lab-node:focus-visible .lab-node__label,
+.lab-node.is-active .lab-node__label {
+  color: var(--color-paper);
+  transform: translateY(-3px);
+}
+
+.lab-node__insight {
+  position: absolute;
+  top: 100%;
+  /* lines up with the keyword label's own left edge (marker width + its
+     10px gap, see .lab-node__label) rather than the marker's own edge */
+  left: calc(var(--lab-size, 16px) + 10px);
+  margin-top: 16px;
+  width: 240px;
+  font-family: var(--font-sans);
+  color: var(--color-paper-dim);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.85);
+  opacity: 0;
+  transform: translateY(-4px);
+  pointer-events: none;
+  transition:
+    opacity 0.35s var(--ease-settle),
+    transform 0.35s var(--ease-settle);
+}
+.lab-node:hover .lab-node__insight,
+.lab-node:focus-visible .lab-node__insight,
+.lab-node.is-active .lab-node__insight {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ---- neural connection lines, drawn only on hover ---- */
+.lab-connections {
+  position: absolute;
+  inset: 0;
+  /* an <svg> is a replaced element with its own intrinsic aspect ratio
+     (1:1 here, from viewBox="0 0 100 100") — inset: 0 alone stretches a
+     normal block box to fill both dimensions, but for a replaced element
+     without explicit width/height it falls back to that intrinsic ratio
+     instead, rendering as a square clipped by .lab-field's overflow:
+     hidden rather than actually matching the field's real (non-square)
+     box. Without these, every node's y% was scaled against the wrong
+     (too-tall) height, most visible for nodes near the bottom. */
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.lab-connection {
+  /* stroke-width is set as an SVG attribute in JSX (strokeWidth prop),
+     not here — a CSS-set stroke-width on an element inside a viewBox'd,
+     preserveAspectRatio="none" SVG resolves as a literal sub-pixel CSS
+     length instead of being scaled by the coordinate-system transform
+     the way a plain attribute value is, so a thin value like 0.09 was
+     silently rendering at ~0 visible coverage instead of the intended
+     ~0.9px. */
+  fill: none;
+  opacity: 0;
+  transition: opacity 0.4s var(--ease-settle);
+}
+.lab-connection.is-active {
+  opacity: 0.8;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lab-marker__ring,
+  .lab-marker__tri,
+  .lab-marker__diamond-wrap,
+  .lab-connection {
+    animation: none !important;
+  }
+}
