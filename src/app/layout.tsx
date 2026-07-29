@@ -36,6 +36,7 @@ const robotoFlex = Roboto_Flex({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://shufu.work"),
   title: "Shu Fu — Designing Technology for Human Connection",
   description:
     "More than a portfolio—an interactive journey through the ideas, experiments, and products shaping how I think about AI, humanity, and connection.",
@@ -43,6 +44,13 @@ export const metadata: Metadata = {
     title: "Shu Fu — Designing Technology for Human Connection",
     description:
       "More than a portfolio—an interactive journey through the ideas, experiments, and products shaping how I think about AI, humanity, and connection.",
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+      },
+    ],
   },
 };
 
