@@ -36,8 +36,14 @@ const robotoFlex = Roboto_Flex({
 });
 
 export const metadata: Metadata = {
-  title: "Shu's Mind",
-  description: "AI Product Designer / Builder — fragments, refracted into signal.",
+  title: "Shu Fu — Designing Technology for Human Connection",
+  description:
+    "More than a portfolio—an interactive journey through the ideas, experiments, and products shaping how I think about AI, humanity, and connection.",
+  openGraph: {
+    title: "Shu Fu — Designing Technology for Human Connection",
+    description:
+      "More than a portfolio—an interactive journey through the ideas, experiments, and products shaping how I think about AI, humanity, and connection.",
+  },
 };
 
 export default function RootLayout({
