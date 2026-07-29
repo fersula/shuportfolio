@@ -61,8 +61,14 @@ export function FeaturedCard({ item, active }: { item: ProjectItem; active: bool
           <span className="font-mono text-xs text-paper-dim">{item.year}</span>
         </div>
         <p className="font-sans text-base font-medium leading-snug text-paper">{item.title}</p>
-        <div className="h-px w-full bg-paper-faint/40" />
-        <p className="font-sans text-xs leading-snug text-paper-dim">{item.subtitle}</p>
+        {/* subtitle + divider: hidden until real hover, independent of
+            `active` — the active section's panel is forced open above, but
+            this pair stays hover-only even then (see reference screenshot:
+            the active/open SerenChina card shows no subtitle until hovered) */}
+        <div className="flex flex-col gap-2 opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100">
+          <div className="h-px w-full bg-paper-faint/40" />
+          <p className="font-sans text-xs leading-snug text-paper-dim">{item.subtitle}</p>
+        </div>
       </div>
     </a>
   );
@@ -140,11 +146,18 @@ export function RelatedCard({ item }: { item: ProjectItem }) {
         />
       </div>
       <div className="flex flex-col gap-1">
-        <div className="flex items-baseline justify-between gap-2">
+        {/* name + year: default-visible, swapped out for subtitle+divider
+            on hover (see reference screenshot — Chimon under hover shows
+            only its title/subtitle, no name/year) */}
+        <div className="flex items-baseline justify-between gap-2 group-hover:hidden">
           <span className="font-sans text-2xl font-bold text-paper">{item.projectName}</span>
           <span className="font-mono text-xs text-paper-dim">{item.year}</span>
         </div>
-        <p className="font-sans text-xs leading-snug text-paper-dim">{item.title}</p>
+        <p className="font-sans text-xs leading-snug text-paper group-hover:text-sm">{item.title}</p>
+        <div className="hidden flex-col gap-2 group-hover:flex">
+          <div className="h-px w-full bg-paper-faint/40" />
+          <p className="font-sans text-xs leading-snug text-paper-dim">{item.subtitle}</p>
+        </div>
       </div>
     </a>
   );

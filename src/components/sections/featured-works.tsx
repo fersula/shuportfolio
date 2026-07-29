@@ -21,7 +21,7 @@ const PROJECTS: Record<string, ProjectItem & { worktype: WorkType }> = {
     projectName: "COMAI",
     year: "2023-2025",
     title: "How can AI feel thoughtful—not merely capable?",
-    subtitle: "Future automotive AI experience · Strategy, embodied AI and two-stage PoC",
+    subtitle: "Future Automotive AI Experiences for Honda: Strategy · Embodied AI · Two-stage PoC",
     link: "https://fushu.framer.website/auto",
     worktype: "Featured",
   },
