@@ -101,17 +101,42 @@ body {
   background-size: 160px 160px;
 }
 
-/* Floating words: each word's depth-layer look (opacity / blur / size)
-   is set inline; when the cursor comes near, .is-focus lifts the word
-   out of its layer — solid white, sharp, slightly enlarged — and CSS
-   transitions ease it back down when the cursor leaves. */
+/* Floating words: position comes from --frag-top/--frag-left (falls back
+   to the desktop value on mobile if no override is authored — see
+   mobileTop/mobileLeft in field-data.ts). GSAP's scroll-driven convergence
+   (hero.tsx, "left: 50%") still overrides this fine since it writes a real
+   inline style, which always wins over a stylesheet rule regardless of
+   where the base value came from. */
+.frag {
+  top: var(--frag-top);
+  left: var(--frag-left);
+}
+@media (max-width: 639px) {
+  .frag {
+    top: var(--frag-top-mobile, var(--frag-top));
+    left: var(--frag-left-mobile, var(--frag-left));
+  }
+}
+
+/* Each word's depth-layer look (opacity / blur / size) is set inline;
+   when the cursor comes near, .is-focus lifts the word out of its layer —
+   solid white, sharp, slightly enlarged — and CSS transitions ease it
+   back down when the cursor leaves. */
 .word-node {
+  font-size: var(--word-size-desktop);
   transition:
     opacity 0.4s var(--ease-settle),
     filter 0.4s var(--ease-settle),
     transform 0.4s var(--ease-settle),
     color 0.4s var(--ease-settle);
   will-change: opacity, filter, transform;
+}
+/* below this, phones get their own smaller scale (see mobileFontSize in
+   field-data.ts) instead of the desktop clamp()'s flat rem floor */
+@media (max-width: 639px) {
+  .word-node {
+    font-size: var(--word-size-mobile);
+  }
 }
 .word-node.is-focus {
   opacity: 1 !important;

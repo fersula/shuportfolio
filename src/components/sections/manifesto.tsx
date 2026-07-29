@@ -42,13 +42,13 @@ export function Manifesto() {
   }, []);
 
   return (
-    <section id="manifesto" ref={sectionRef} className="relative min-h-svh bg-ink">
-      <div className="flex min-h-svh flex-col justify-center px-gutter py-section lg:pl-[380px] lg:pr-gutter">
+    <section id="manifesto" ref={sectionRef} className="relative bg-ink md:min-h-svh">
+      <div className="flex flex-col justify-center px-gutter py-[80px] md:min-h-svh md:py-section lg:pl-[380px] lg:pr-gutter">
         <div ref={wonderRef} className="max-w-2xl">
           <h2 className="font-mono text-base tracking-[0.04em] text-blue md:text-lg">
             I wonder why
           </h2>
-          <p className="mt-5 font-sans text-[32px] leading-relaxed text-paper">
+          <p className="mt-5 font-sans text-[24px] leading-relaxed text-paper sm:text-[32px]">
             The more advanced our technology becomes, the more I wonder why
             people still feel disconnected.
           </p>
@@ -58,7 +58,7 @@ export function Manifesto() {
           <h2 className="font-mono text-base tracking-[0.04em] text-[#D0634D] md:text-lg">
             My sincere calling
           </h2>
-          <p className="mt-5 font-sans text-[32px] leading-relaxed text-paper">
+          <p className="mt-5 font-sans text-[24px] leading-relaxed text-paper sm:text-[32px]">
             I use emerging technology to help people feel more understood,
             and more connected to themselves, others, and the world.
           </p>

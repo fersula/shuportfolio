@@ -102,7 +102,7 @@ export function Hero() {
 
       <div
         ref={contentRef}
-        className="relative z-30 flex h-full w-full flex-col justify-center px-gutter"
+        className="relative z-30 flex h-full w-full flex-col items-center justify-center px-gutter sm:items-stretch"
       >
         <motion.div
           initial={{ opacity: 0, y: 24 }}

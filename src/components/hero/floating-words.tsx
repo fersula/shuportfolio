@@ -76,7 +76,7 @@ export function FloatingWords({
   return (
     <div
       ref={rootRef}
-      className="pointer-events-none absolute inset-0 z-20 hidden sm:block"
+      className="pointer-events-none absolute inset-0 z-20"
     >
       {FRAGMENTS.map((f, i) => {
         const L = LAYERS[f.layer];
@@ -88,7 +88,14 @@ export function FloatingWords({
               else wrapRefs.current.delete(f.id);
             }}
             className="frag absolute -translate-x-1/2 -translate-y-1/2"
-            style={{ top: f.top, left: f.left }}
+            style={
+              {
+                "--frag-top": f.top,
+                "--frag-left": f.left,
+                ...(f.mobileTop ? { "--frag-top-mobile": f.mobileTop } : {}),
+                ...(f.mobileLeft ? { "--frag-left-mobile": f.mobileLeft } : {}),
+              } as React.CSSProperties
+            }
           >
             <motion.div
               initial={{ opacity: 0, y: 14 }}
@@ -117,11 +124,14 @@ export function FloatingWords({
                       else nodeRefs.current.delete(f.id);
                     }}
                     className="word-node block whitespace-nowrap text-center font-grotesk font-medium text-paper"
-                    style={{
-                      fontSize: L.fontSize,
-                      opacity: L.opacity,
-                      filter: L.blur ? `blur(${L.blur}px)` : "none",
-                    }}
+                    style={
+                      {
+                        "--word-size-desktop": L.fontSize,
+                        "--word-size-mobile": L.mobileFontSize,
+                        opacity: L.opacity,
+                        filter: L.blur ? `blur(${L.blur}px)` : "none",
+                      } as React.CSSProperties
+                    }
                   >
                     {f.text}
                   </span>

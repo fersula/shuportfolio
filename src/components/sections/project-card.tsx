@@ -43,7 +43,7 @@ export function FeaturedCard({ item, active }: { item: ProjectItem; active: bool
           alt={item.projectName}
           fill
           sizes="(min-width: 1024px) 32vw, 55vw"
-          className="object-cover"
+          className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
         />
       </div>
 
@@ -68,6 +68,55 @@ export function FeaturedCard({ item, active }: { item: ProjectItem; active: bool
   );
 }
 
+/** Mobile Featured Works: image on top, text below — a plain always-visible
+ *  block instead of the hover/active-gated flex-row panel above, since
+ *  there's no hover state and every mobile section is shown expanded, not
+ *  just the one with scroll focus. Kept as its own component rather than
+ *  a variant prop on FeaturedCard so desktop's markup stays untouched. */
+export function FeaturedCardMobile({ item }: { item: ProjectItem }) {
+  return (
+    <a href={item.link} target="_blank" rel="noopener noreferrer" className="flex flex-col gap-4">
+      <div className="relative w-full overflow-hidden rounded-[24px] [aspect-ratio:4/3]">
+        <Image src={item.src} alt={item.projectName} fill sizes="100vw" className="object-cover" />
+      </div>
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-1.5 text-turquoise">
+          <span className="font-mono text-sm">Featured Work</span>
+          <SparkleIcon className="h-5 w-5" />
+        </div>
+        <div className="flex items-baseline justify-between gap-4">
+          <span className="font-sans text-2xl font-bold text-paper">{item.projectName}</span>
+          <span className="font-mono text-xs text-paper-dim">{item.year}</span>
+        </div>
+        <p className="font-sans text-base font-medium leading-snug text-paper">{item.title}</p>
+        <div className="h-px w-full bg-paper-faint/40" />
+        <p className="font-sans text-xs leading-snug text-paper-dim">{item.subtitle}</p>
+      </div>
+    </a>
+  );
+}
+
+/** Mobile Featured Works: the Related pair's image/text also stack (image
+ *  on top, text below) instead of desktop's side-by-side grid — the two
+ *  cards themselves stay side by side (see the grid-cols-2 wrapper in
+ *  featured-works.tsx), only each card's own internal layout changes. */
+export function RelatedCardMobile({ item }: { item: ProjectItem }) {
+  return (
+    <a href={item.link} target="_blank" rel="noopener noreferrer" className="flex flex-1 flex-col gap-3">
+      <div className="relative w-full overflow-hidden rounded-[16px] [aspect-ratio:1/1]">
+        <Image src={item.src} alt={item.projectName} fill sizes="50vw" className="object-cover" />
+      </div>
+      <div className="flex flex-col gap-1">
+        <div className="flex items-baseline justify-between gap-2">
+          <span className="font-sans text-lg font-bold text-paper">{item.projectName}</span>
+          <span className="font-mono text-xs text-paper-dim">{item.year}</span>
+        </div>
+        <p className="font-sans text-xs leading-snug text-paper-dim">{item.title}</p>
+      </div>
+    </a>
+  );
+}
+
 /** Small always-visible caption card — name/year/title only, no subtitle,
  *  smaller type than the Featured card. Only ever rendered inside an
  *  active section's accordion, so it has no dim/blur state of its own.
@@ -75,14 +124,19 @@ export function FeaturedCard({ item, active }: { item: ProjectItem; active: bool
  *  together always fills the same total width as the Featured card above. */
 export function RelatedCard({ item }: { item: ProjectItem }) {
   return (
-    <a href={item.link} target="_blank" rel="noopener noreferrer" className="grid flex-1 grid-cols-2 items-center gap-6">
+    <a
+      href={item.link}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group grid flex-1 grid-cols-2 items-center gap-6"
+    >
       <div className="relative overflow-hidden rounded-[20px] [aspect-ratio:1/1]">
         <Image
           src={item.src}
           alt={item.projectName}
           fill
           sizes="(min-width: 1024px) 14vw, 22vw"
-          className="object-cover"
+          className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
         />
       </div>
       <div className="flex flex-col gap-1">
@@ -90,7 +144,7 @@ export function RelatedCard({ item }: { item: ProjectItem }) {
           <span className="font-sans text-2xl font-bold text-paper">{item.projectName}</span>
           <span className="font-mono text-xs text-paper-dim">{item.year}</span>
         </div>
-        <p className="font-sans text-sm leading-snug text-paper-dim">{item.title}</p>
+        <p className="font-sans text-xs leading-snug text-paper-dim">{item.title}</p>
       </div>
     </a>
   );

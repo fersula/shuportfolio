@@ -1,15 +1,20 @@
 export type DepthLayer = "d1" | "d2" | "d3" | "d4";
 
 /* Each depth layer uniformly controls font size, blur, opacity — and its
-   parallax coefficient (how far it shifts with the mouse). d1 is nearest. */
+   parallax coefficient (how far it shifts with the mouse). d1 is nearest.
+   mobileFontSize is a separate, smaller clamp() used only below the `sm`
+   breakpoint (see .word-node in globals.css) — the desktop clamp()s above
+   are tuned for a wide viewport and pin to their flat rem floor well before
+   phone widths, so phones need their own scale rather than just riding the
+   same vw curve down. */
 export const LAYERS: Record<
   DepthLayer,
-  { fontSize: string; blur: number; opacity: number; parallax: number }
+  { fontSize: string; mobileFontSize: string; blur: number; opacity: number; parallax: number }
 > = {
-  d1: { fontSize: "clamp(2.75rem, 4.5vw, 4.25rem)", blur: 1, opacity: 0.95, parallax: 0.08 },
-  d2: { fontSize: "clamp(2rem, 3vw, 2.9rem)", blur: 1.5, opacity: 0.85, parallax: 0.06 },
-  d3: { fontSize: "clamp(1.2rem, 1.9vw, 1.8rem)", blur: 2, opacity: 0.65, parallax: 0.04 },
-  d4: { fontSize: "clamp(0.85rem, 1.3vw, 1.15rem)", blur: 2.5, opacity: 0.5, parallax: 0.02 },
+  d1: { fontSize: "clamp(2.75rem, 4.5vw, 4.25rem)", mobileFontSize: "clamp(1.6rem, 8vw, 2.4rem)", blur: 1, opacity: 0.95, parallax: 0.08 },
+  d2: { fontSize: "clamp(2rem, 3vw, 2.9rem)", mobileFontSize: "clamp(1.15rem, 5.8vw, 1.75rem)", blur: 1.5, opacity: 0.85, parallax: 0.06 },
+  d3: { fontSize: "clamp(1.2rem, 1.9vw, 1.8rem)", mobileFontSize: "clamp(0.85rem, 4.2vw, 1.3rem)", blur: 2, opacity: 0.65, parallax: 0.04 },
+  d4: { fontSize: "clamp(0.85rem, 1.3vw, 1.15rem)", mobileFontSize: "clamp(0.65rem, 3vw, 1rem)", blur: 2.5, opacity: 0.5, parallax: 0.02 },
 };
 
 export type Fragment = {
@@ -18,6 +23,11 @@ export type Fragment = {
   /** position as a percentage of the hero viewport */
   top: string;
   left: string;
+  /** mobile-only position override (see .frag in globals.css) — only set
+      where the desktop position collides with something mobile-specific,
+      e.g. the centered SHU.F title or a mobile-sized neighbor word */
+  mobileTop?: string;
+  mobileLeft?: string;
   layer: DepthLayer;
   /** stagger + float timing offsets so the field doesn't move in lockstep */
   delay: number;
@@ -29,10 +39,14 @@ export type Fragment = {
 export const FRAGMENTS: Fragment[] = [
   // nearest
   { id: "ai", text: "AI", top: "78%", left: "67%", layer: "d1", delay: 0.45, floatDuration: 7 },
+  // mobile: "SHU.F" sits centered around ~44-56% of the hero height, and
+  // 57% was landing right on its bottom edge — pushed down to clear it
+  { id: "culture", text: "Culture", top: "57%", left: "60%", mobileTop: "68%", layer: "d1", delay: 0.1, floatDuration: 8 },
   // second plane
-  { id: "culture", text: "Culture", top: "57%", left: "60%", layer: "d2", delay: 0.1, floatDuration: 8 },
-  { id: "human", text: "Human", top: "30%", left: "45%", layer: "d2", delay: 0.25, floatDuration: 9 },
-  { id: "intelligence", text: "Intelligence", top: "30%", left: "73%", layer: "d2", delay: 0.6, floatDuration: 8.5 },
+  // mobile: same top (30%) put these two edge-to-edge at mobile's bigger
+  // font sizes — staggered vertically so they don't crowd each other
+  { id: "human", text: "Human", top: "30%", left: "45%", mobileTop: "22%", layer: "d2", delay: 0.25, floatDuration: 9 },
+  { id: "intelligence", text: "Intelligence", top: "30%", left: "73%", mobileTop: "38%", layer: "d2", delay: 0.6, floatDuration: 8.5 },
   { id: "history", text: "History", top: "63%", left: "83%", layer: "d2", delay: 0.35, floatDuration: 7.5 },
   // third plane
   { id: "emotion", text: "Emotion", top: "44%", left: "83%", layer: "d3", delay: 0.15, floatDuration: 8 },

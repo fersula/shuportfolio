@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { EASE } from "@/lib/motion";
 import { gsap } from "@/lib/gsap";
 import { BorderGlow } from "@/components/ui/border-glow";
+import { useIsMobile } from "@/lib/use-is-mobile";
 
 type Tab = {
   key: string;
@@ -126,6 +127,7 @@ export function Intro() {
   const activeTab = TABS.find((t) => t.key === active) ?? TABS[0];
   const cardRef = useRef<HTMLDivElement>(null);
   const teaserRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -156,7 +158,7 @@ export function Intro() {
 
   return (
     <section id="intro" className="relative bg-ink">
-      <div className="flex min-h-svh flex-col justify-center px-gutter py-section lg:pl-[380px] lg:pr-gutter">
+      <div className="flex flex-col justify-center px-gutter pb-[120px] pt-0 md:min-h-svh md:py-section lg:pl-[380px] lg:pr-gutter">
         <div ref={cardRef} className="max-w-2xl">
           <BorderGlow
             borderRadius={24}
@@ -168,62 +170,124 @@ export function Intro() {
             edgeSensitivity={30}
             colors={["#10b981", "#4d85d7", "#d0634d"]}
           >
-            <div className="p-8 md:p-10">
-              <div className="flex flex-col gap-10 md:flex-row md:items-center">
-                <nav className="flex shrink-0 flex-col gap-4">
-                  {TABS.map((tab) => (
-                    <button
-                      key={tab.key}
-                      type="button"
-                      onClick={() => setActive(tab.key)}
-                      className={`text-left font-mono text-sm transition-colors duration-300 ${
-                        active === tab.key
-                          ? "text-paper"
-                          : "text-paper-dim/60 hover:text-paper-dim"
-                      }`}
-                    >
-                      {tab.label}
-                    </button>
-                  ))}
-                </nav>
-
-                <div className="flex-1">
+            {/* mobile: avatar in the card's left region (vertically centered
+                against the taller tab list), tabs pushed to the card's
+                right edge (justify-between), bio below — a genuinely
+                different arrangement from desktop's
+                nav-column + stacked avatar/text, not just a reflow of the
+                same DOM, so it's kept as its own branch rather than fought
+                into shared markup via CSS alone. Gated on a mounted-only
+                isMobile (rather than Tailwind breakpoints) so exactly one
+                <video> mounts at a time instead of decoding two
+                simultaneously. */}
+            {isMobile && (
+              <div className="p-8">
+                <div className="flex items-center justify-between gap-4">
                   <video
                     src="/emo.mp4"
                     autoPlay
                     loop
                     muted
                     playsInline
-                    className="mb-4 h-[100px] w-[100px] rounded-full object-cover"
+                    className="h-[100px] w-[100px] shrink-0 rounded-full object-cover"
                   />
-                  <div className="relative">
-                    {/* invisible sizer, pinned to the first tab's text — keeps the
-                        card's height fixed instead of hugging whichever tab is active */}
-                    <p aria-hidden className="invisible font-sans text-[24px] leading-relaxed">
-                      {TABS[0].text}
-                    </p>
-                    <div className="absolute inset-0">
-                      <AnimatePresence mode="wait">
-                        <motion.div
-                          key={active}
-                          initial={{ opacity: 0, y: 8 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -8 }}
-                          transition={{ duration: 0.35, ease: EASE.settle }}
-                        >
-                          <SpotlightText text={activeTab.text} />
-                        </motion.div>
-                      </AnimatePresence>
+                  <nav className="flex flex-col items-start gap-2">
+                    {TABS.map((tab) => (
+                      <button
+                        key={tab.key}
+                        type="button"
+                        onClick={() => setActive(tab.key)}
+                        className={`text-left font-mono text-xs transition-colors duration-300 ${
+                          active === tab.key
+                            ? "text-paper"
+                            : "text-paper-dim/60 hover:text-paper-dim"
+                        }`}
+                      >
+                        {tab.label}
+                      </button>
+                    ))}
+                  </nav>
+                </div>
+
+                <div className="relative mt-6">
+                  <p aria-hidden className="invisible font-sans text-[24px] leading-relaxed">
+                    {TABS[0].text}
+                  </p>
+                  <div className="absolute inset-0">
+                    <AnimatePresence mode="wait">
+                      <motion.div
+                        key={active}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.35, ease: EASE.settle }}
+                      >
+                        <SpotlightText text={activeTab.text} />
+                      </motion.div>
+                    </AnimatePresence>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {!isMobile && (
+              <div className="p-8 md:p-10">
+                <div className="flex flex-col gap-10 md:flex-row md:items-center">
+                  <nav className="flex shrink-0 flex-col gap-4">
+                    {TABS.map((tab) => (
+                      <button
+                        key={tab.key}
+                        type="button"
+                        onClick={() => setActive(tab.key)}
+                        className={`text-left font-mono text-sm transition-colors duration-300 ${
+                          active === tab.key
+                            ? "text-paper"
+                            : "text-paper-dim/60 hover:text-paper-dim"
+                        }`}
+                      >
+                        {tab.label}
+                      </button>
+                    ))}
+                  </nav>
+
+                  <div className="flex-1">
+                    <video
+                      src="/emo.mp4"
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      className="mb-4 h-[100px] w-[100px] rounded-full object-cover"
+                    />
+                    <div className="relative">
+                      {/* invisible sizer, pinned to the first tab's text — keeps the
+                          card's height fixed instead of hugging whichever tab is active */}
+                      <p aria-hidden className="invisible font-sans text-[24px] leading-relaxed">
+                        {TABS[0].text}
+                      </p>
+                      <div className="absolute inset-0">
+                        <AnimatePresence mode="wait">
+                          <motion.div
+                            key={active}
+                            initial={{ opacity: 0, y: 8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -8 }}
+                            transition={{ duration: 0.35, ease: EASE.settle }}
+                          >
+                            <SpotlightText text={activeTab.text} />
+                          </motion.div>
+                        </AnimatePresence>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
+            )}
           </BorderGlow>
         </div>
       </div>
 
-      <div className="flex min-h-svh flex-col justify-center px-gutter py-section lg:pl-[380px] lg:pr-gutter">
+      <div className="flex flex-col justify-center px-gutter pb-[80px] pt-0 md:min-h-svh md:py-section lg:pl-[380px] lg:pr-gutter">
         <div id="featured-works-teaser" ref={teaserRef} className="max-w-2xl">
           <h2 className="font-mono text-base tracking-[0.04em] text-blue md:text-lg">
             Featured Works

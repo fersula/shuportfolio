@@ -2,8 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import { OptionWheel } from "./option-wheel";
-import { FeaturedCard, RelatedCard, type ProjectItem } from "./project-card";
+import { FeaturedCard, RelatedCard, FeaturedCardMobile, RelatedCardMobile, type ProjectItem } from "./project-card";
 import { gsap } from "@/lib/gsap";
+import { useIsMobile } from "@/lib/use-is-mobile";
 
 // Single source of truth for project content. `worktype` documents each
 // project's canonical role, but doesn't drive rendering directly — the same
@@ -73,7 +74,7 @@ const PROJECTS: Record<string, ProjectItem & { worktype: WorkType }> = {
     title:
       "How can a city turn disaster preparedness and cultural heritage into an explorable virtual world?",
     subtitle: "Public-sector metaverse · Spatial UX, Unreal Engine and geospatial mapping",
-    link: "https://chimonart.framer.website/",
+    link: "https://fushu.framer.website/metamatsu",
     worktype: "Related",
   },
   metabond: {
@@ -118,9 +119,47 @@ const SECTIONS: { category: string; featured: string; related: [string, string] 
 const CATEGORIES = SECTIONS.map((section) => section.category);
 
 export function FeaturedWorks() {
+  const isMobile = useIsMobile();
   const [activeIndex, setActiveIndex] = useState(0);
   const sectionRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const mobileSectionRefs = useRef<(HTMLDivElement | null)[]>([]);
   const teaserRef = useRef<HTMLDivElement>(null);
+
+  // mobile only (desktop's four blocks use the active/dim scrollspy look
+  // instead, see FeaturedCard's `active` prop) — same fade-up-on-scroll
+  // house style as the teaser below, re-runs once the mobile branch is
+  // actually mounted and mobileSectionRefs is populated.
+  useEffect(() => {
+    if (!isMobile) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const tweens = mobileSectionRefs.current
+      .filter((el): el is HTMLDivElement => el !== null)
+      .map((el) =>
+        gsap.fromTo(
+          el,
+          { opacity: 0, y: 28 },
+          {
+            opacity: 1,
+            y: 0,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: el,
+              start: "top 88%",
+              end: "top 55%",
+              scrub: true,
+            },
+          }
+        )
+      );
+
+    return () => {
+      tweens.forEach((tween) => {
+        tween.scrollTrigger?.kill();
+        tween.kill();
+      });
+    };
+  }, [isMobile]);
 
   // same fade-up-on-scroll house style as the Intro/Manifesto/Featured Works
   // teasers — this one previews "Shu's Refraction Lab", the section after
@@ -176,57 +215,97 @@ export function FeaturedWorks() {
 
   return (
     <section id="featured-works" className="relative bg-ink">
-      <div className="flex flex-col px-gutter lg:flex-row">
-        <div
-          id="featured-works-wheel"
-          className="flex h-[45svh] w-full shrink-0 items-center gap-4 lg:sticky lg:top-0 lg:h-svh lg:w-[42%]"
-        >
-          <span className="shrink-0 whitespace-nowrap font-mono text-base text-paper md:text-2xl">
-            Connection with
-          </span>
-          <div className="relative h-[70svh] flex-1">
-            <OptionWheel
-              items={CATEGORIES}
-              defaultSelected={0}
-              selectedIndex={activeIndex}
-              wheelInput={false}
-              draggable={false}
-              side="left"
-              inset={32}
-              fontSize={2}
-              onChange={(index) => scrollToSection(index)}
-            />
-          </div>
-        </div>
-
-        <div className="flex w-full flex-col lg:w-[58%]">
+      {/* mobile: no wheel — each section gets its own static
+          "Connection with [Category]" title (Category keeping the wheel's
+          own font-grotesk look) immediately above its cards, and every
+          section renders fully expanded since there's no scrollspy-driven
+          "focus" concept without the wheel to sync against. */}
+      {isMobile && (
+        <div className="flex flex-col px-gutter">
           {SECTIONS.map((section, i) => {
-            const active = activeIndex === i;
             const featured = PROJECTS[section.featured];
             const related = section.related.map((id) => PROJECTS[id]);
             return (
               <div
                 key={section.category}
                 ref={(el) => {
-                  sectionRefs.current[i] = el;
+                  mobileSectionRefs.current[i] = el;
                 }}
-                className="flex flex-col py-10"
+                className={`flex flex-col gap-8 ${i === 0 ? "pt-0" : "pt-10"} ${
+                  i === SECTIONS.length - 1 ? "pb-[120px]" : "pb-10"
+                }`}
               >
-                <FeaturedCard item={featured} active={active} />
-                <div className={`related-accordion mt-12 ${active ? "is-open" : ""}`}>
-                  <div className="flex w-full gap-8">
-                    {related.map((item) => (
-                      <RelatedCard key={item.id} item={item} />
-                    ))}
-                  </div>
+                <h2 className="flex flex-wrap items-baseline gap-2">
+                  <span className="font-mono text-base text-paper">Connection with</span>
+                  <span className="font-grotesk text-[2rem] font-medium text-paper">
+                    {section.category}
+                  </span>
+                </h2>
+                <FeaturedCardMobile item={featured} />
+                <div className="grid grid-cols-2 gap-4">
+                  {related.map((item) => (
+                    <RelatedCardMobile key={item.id} item={item} />
+                  ))}
                 </div>
               </div>
             );
           })}
         </div>
-      </div>
+      )}
 
-      <div className="flex min-h-svh flex-col justify-center px-gutter py-section lg:pl-[380px] lg:pr-gutter">
+      {!isMobile && (
+        <div className="flex flex-col px-gutter lg:flex-row">
+          <div
+            id="featured-works-wheel"
+            className="flex h-[45svh] w-full shrink-0 items-center gap-4 lg:sticky lg:top-0 lg:h-svh lg:w-[42%]"
+          >
+            <span className="shrink-0 whitespace-nowrap font-mono text-base text-paper md:text-2xl">
+              Connection with
+            </span>
+            <div className="relative h-[70svh] flex-1">
+              <OptionWheel
+                items={CATEGORIES}
+                defaultSelected={0}
+                selectedIndex={activeIndex}
+                wheelInput={false}
+                draggable={false}
+                side="left"
+                inset={32}
+                fontSize={2}
+                onChange={(index) => scrollToSection(index)}
+              />
+            </div>
+          </div>
+
+          <div className="flex w-full flex-col lg:w-[58%]">
+            {SECTIONS.map((section, i) => {
+              const active = activeIndex === i;
+              const featured = PROJECTS[section.featured];
+              const related = section.related.map((id) => PROJECTS[id]);
+              return (
+                <div
+                  key={section.category}
+                  ref={(el) => {
+                    sectionRefs.current[i] = el;
+                  }}
+                  className="flex flex-col py-10"
+                >
+                  <FeaturedCard item={featured} active={active} />
+                  <div className={`related-accordion mt-12 ${active ? "is-open" : ""}`}>
+                    <div className="flex w-full gap-8">
+                      {related.map((item) => (
+                        <RelatedCard key={item.id} item={item} />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      <div className="flex flex-col justify-center px-gutter pb-[80px] pt-0 md:min-h-svh md:py-section lg:pl-[380px] lg:pr-gutter">
         <div id="refraction-lab-teaser" ref={teaserRef} className="max-w-2xl">
           <h2 className="font-mono text-base tracking-[0.04em] text-turquoise md:text-lg">
             Shu&apos;s Refraction Lab
