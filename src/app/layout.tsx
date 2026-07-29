@@ -8,7 +8,7 @@ import "./globals.css";
    Space Grotesk  — floating words
    DM Sans        — body reading text
 
-   Roboto Flex is a deliberate, scoped exception: the Hero's "SHU.F"
+   Roboto Flex is a deliberate, scoped exception: the Hero's "SHU F."
    TextPressure effect (src/components/hero/text-pressure.tsx) needs a
    variable font with real wght + wdth axes to drive its cursor-pressure
    animation, which none of the three above expose. Not used anywhere

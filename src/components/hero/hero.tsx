@@ -108,11 +108,10 @@ export function Hero() {
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: EASE.prism, delay: 0.2 }}
-          className="relative leading-none tracking-tight"
-          style={{ width: "clamp(16.15rem, 35.5vw, 32.3rem)" }}
+          className="relative w-[clamp(18rem,35.5vw,32.3rem)] leading-none tracking-tight lg:w-[clamp(16.15rem,39vw,35.5rem)]"
         >
           <TextPressure
-            text="SHU.F"
+            text="SHU F."
             textColor="#ffffff"
             minFontSize={100}
             width={false}

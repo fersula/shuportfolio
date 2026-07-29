@@ -26,7 +26,7 @@ const ITEMS: NavItem[] = [
   },
   {
     num: "05",
-    label: "Shu's Lab",
+    label: "Refraction Lab",
     id: "refraction-lab",
     trackIds: ["refraction-lab-teaser"],
   },
@@ -120,7 +120,7 @@ export function IndexSidebar() {
   //      center, staying hidden through Featured Works itself — its own
   //      "Connection with" wheel is the nav there instead
   //   3. fades back IN as the Refraction Lab teaser (in Featured Works)
-  //      approaches, to preview "05 Shu's Lab"
+  //      approaches, to preview "05 Refraction Lab"
   //   4. fades OUT again once that teaser crosses center, staying hidden
   //      through Refraction Lab — the Lab has its own left-side filter
   //      instead

@@ -312,7 +312,7 @@ export function FeaturedWorks() {
           </h2>
           <p className="mt-5 font-sans text-[24px] leading-relaxed text-paper">
             A living archive of the questions, observations, and experiments shaping how I
-            think.
+            think, and they are still expanding...
           </p>
         </div>
       </div>
