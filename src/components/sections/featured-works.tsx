@@ -5,6 +5,9 @@ import { OptionWheel } from "./option-wheel";
 import { FeaturedCard, RelatedCard, FeaturedCardMobile, RelatedCardMobile, type ProjectItem } from "./project-card";
 import { gsap } from "@/lib/gsap";
 import { useIsMobile } from "@/lib/use-is-mobile";
+import { useLocale } from "@/lib/i18n/locale-context";
+import { UI_COPY } from "@/lib/i18n/ui-copy";
+import { PROJECTS_COPY } from "@/lib/i18n/projects-copy";
 
 // Single source of truth for project content. `worktype` documents each
 // project's canonical role, but doesn't drive rendering directly — the same
@@ -118,7 +121,15 @@ const SECTIONS: { category: string; featured: string; related: [string, string] 
 
 const CATEGORIES = SECTIONS.map((section) => section.category);
 
+/** merges the translated title/subtitle for a project on top of its
+ *  locale-agnostic base fields (image, projectName, year, link) */
+function localizeProject(item: ProjectItem & { worktype: WorkType }, locale: "en" | "zh") {
+  return { ...item, ...PROJECTS_COPY[item.id][locale] };
+}
+
 export function FeaturedWorks() {
+  const { locale } = useLocale();
+  const categoryLabel = (category: string) => UI_COPY[locale].featuredWorks.categories[category] ?? category;
   const isMobile = useIsMobile();
   const [activeIndex, setActiveIndex] = useState(0);
   const sectionRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -223,8 +234,9 @@ export function FeaturedWorks() {
       {isMobile && (
         <div className="flex flex-col px-gutter">
           {SECTIONS.map((section, i) => {
-            const featured = PROJECTS[section.featured];
-            const related = section.related.map((id) => PROJECTS[id]);
+            const featured = localizeProject(PROJECTS[section.featured], locale);
+            const related = section.related.map((id) => localizeProject(PROJECTS[id], locale));
+            const [wrapOpen, wrapClose] = UI_COPY[locale].featuredWorks.connectionCategoryWrap;
             return (
               <div
                 key={section.category}
@@ -236,9 +248,13 @@ export function FeaturedWorks() {
                 }`}
               >
                 <h2 className="flex flex-wrap items-baseline gap-2">
-                  <span className="font-mono text-base text-paper">Connection with</span>
+                  <span className="font-mono text-base text-paper">
+                    {UI_COPY[locale].featuredWorks.connectionWithPrefix}
+                  </span>
                   <span className="font-grotesk text-[2rem] font-medium text-paper">
-                    {section.category}
+                    {wrapOpen}
+                    {categoryLabel(section.category)}
+                    {wrapClose}
                   </span>
                 </h2>
                 <FeaturedCardMobile item={featured} />
@@ -260,11 +276,11 @@ export function FeaturedWorks() {
             className="flex h-[45svh] w-full shrink-0 items-center gap-4 lg:sticky lg:top-0 lg:h-svh lg:w-[42%]"
           >
             <span className="shrink-0 whitespace-nowrap font-mono text-base text-paper md:text-2xl">
-              Connection with
+              {UI_COPY[locale].featuredWorks.connectionWithPrefix}
             </span>
             <div className="relative h-[70svh] flex-1">
               <OptionWheel
-                items={CATEGORIES}
+                items={CATEGORIES.map(categoryLabel)}
                 defaultSelected={0}
                 selectedIndex={activeIndex}
                 wheelInput={false}
@@ -280,8 +296,8 @@ export function FeaturedWorks() {
           <div className="flex w-full flex-col lg:w-[58%]">
             {SECTIONS.map((section, i) => {
               const active = activeIndex === i;
-              const featured = PROJECTS[section.featured];
-              const related = section.related.map((id) => PROJECTS[id]);
+              const featured = localizeProject(PROJECTS[section.featured], locale);
+              const related = section.related.map((id) => localizeProject(PROJECTS[id], locale));
               return (
                 <div
                   key={section.category}
@@ -308,11 +324,10 @@ export function FeaturedWorks() {
       <div className="flex flex-col justify-center px-gutter pb-[80px] pt-0 md:min-h-svh md:py-section lg:pl-[380px] lg:pr-gutter">
         <div id="refraction-lab-teaser" ref={teaserRef} className="max-w-2xl">
           <h2 className="font-mono text-base tracking-[0.04em] text-turquoise md:text-lg">
-            Shu&apos;s Refraction Lab
+            {UI_COPY[locale].featuredWorks.refractionTeaserHeading}
           </h2>
           <p className="mt-5 font-sans text-[24px] leading-relaxed text-paper">
-            A living archive of the questions, observations, and experiments shaping how I
-            think, and they are still expanding...
+            {UI_COPY[locale].featuredWorks.refractionTeaserBody}
           </p>
         </div>
       </div>

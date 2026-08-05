@@ -12,6 +12,9 @@ import {
 import { NodeMarker } from "./node-marker";
 import { DetailPanel } from "./detail-panel";
 import Particles from "./particles";
+import { useLocale } from "@/lib/i18n/locale-context";
+import { UI_COPY } from "@/lib/i18n/ui-copy";
+import { LAB_NODE_COPY } from "@/lib/i18n/refraction-lab-copy";
 import "./refraction-lab.css";
 
 const FILTER_TYPES: NodeType[] = ["question", "observation", "hypothesis", "experiment"];
@@ -79,6 +82,8 @@ function NodeItem({
   onLeave: () => void;
   onSelect: () => void;
 }) {
+  const { locale } = useLocale();
+  const copy = LAB_NODE_COPY[node.id][locale];
   // the first listed type drives the marker's shape/color — a node can
   // belong to more than one filter category, but only wears one look
   const color = NODE_TYPE_META[node.types[0]].color;
@@ -115,8 +120,8 @@ function NodeItem({
         opacity={depth.opacity}
         blur={depth.blur}
       />
-      <span className="lab-node__label font-grotesk text-sm">{node.label}</span>
-      <span className="lab-node__insight font-sans text-xs leading-snug">{node.insight}</span>
+      <span className="lab-node__label font-grotesk text-sm">{copy.label}</span>
+      <span className="lab-node__insight font-sans text-xs leading-snug">{copy.insight}</span>
     </div>
   );
 }
@@ -130,6 +135,8 @@ function NodeItem({
  * scanning a list. Content lives in src/lib/refraction-lab-data.ts.
  */
 export function RefractionLab() {
+  const { locale } = useLocale();
+  const copy = UI_COPY[locale].refractionLab;
   const [activeFilters, setActiveFilters] = useState<Set<NodeType>>(new Set());
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -316,16 +323,17 @@ export function RefractionLab() {
         {/* left: the type filter, vertically centered in the section */}
         <div className="flex w-full shrink-0 flex-col justify-center lg:w-72 lg:pr-10">
           <div>
-            <span className="font-mono text-base text-paper md:text-2xl">Show me...</span>
+            <span className="font-mono text-base text-paper md:text-2xl">{copy.showMePrefix}</span>
             <div className="mt-6 flex flex-col gap-5">
               {FILTER_TYPES.map((type) => {
                 const meta = NODE_TYPE_META[type];
+                const metaCopy = copy.nodeTypeMeta[type];
                 const active = activeFilters.has(type);
                 return (
                   <div key={type} className="flex items-center gap-3">
                     <button
                       type="button"
-                      title={meta.description}
+                      title={metaCopy.description}
                       aria-pressed={active}
                       onClick={() => addFilter(type)}
                       className={`flex flex-1 items-center gap-3 text-left font-mono text-sm transition-colors duration-300 ${
@@ -333,12 +341,12 @@ export function RefractionLab() {
                       }`}
                     >
                       <NodeMarker type={type} color={meta.color} size={12} />
-                      {meta.label}
+                      {metaCopy.label}
                     </button>
                     {active && (
                       <button
                         type="button"
-                        aria-label={`Remove ${meta.label} filter`}
+                        aria-label={copy.removeFilterAriaLabel(metaCopy.label)}
                         onClick={() => removeFilter(type)}
                         className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-paper-dim/50 font-mono text-[10px] leading-none text-paper-dim transition-colors duration-300 hover:border-paper hover:text-paper"
                       >

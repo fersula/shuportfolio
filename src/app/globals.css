@@ -63,10 +63,15 @@
   --color-mint: var(--color-mint);
 
   /* type — locked system: mono = titles/labels, grotesk = floating words,
-     sans = body reading text */
-  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-grotesk: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+     sans = body reading text. Noto Sans SC sits as a fallback in each
+     stack (not a locale-gated swap) — DM Sans/Space Grotesk/JetBrains
+     Mono only cover Latin glyphs, so the browser's own per-character font
+     fallback reaches Noto Sans SC for CJK characters while Latin text
+     (English body copy, project names like "COMAI") keeps rendering in
+     the original locked typeface regardless of which locale is active. */
+  --font-sans: var(--font-dm-sans), var(--font-noto-sans-sc), ui-sans-serif, system-ui, sans-serif;
+  --font-grotesk: var(--font-space-grotesk), var(--font-noto-sans-sc), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), var(--font-noto-sans-sc), ui-monospace, monospace;
 
   /* spacing */
   --spacing-gutter: var(--spacing-gutter);

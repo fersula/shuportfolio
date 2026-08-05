@@ -1,6 +1,8 @@
 "use client";
 
 import Image from "next/image";
+import { useLocale } from "@/lib/i18n/locale-context";
+import { UI_COPY } from "@/lib/i18n/ui-copy";
 
 export type ProjectItem = {
   id: string;
@@ -28,6 +30,7 @@ function SparkleIcon({ className }: { className?: string }) {
  * section not currently in focus.
  */
 export function FeaturedCard({ item, active }: { item: ProjectItem; active: boolean }) {
+  const { locale } = useLocale();
   return (
     <a
       href={item.link}
@@ -53,7 +56,7 @@ export function FeaturedCard({ item, active }: { item: ProjectItem; active: bool
         }`}
       >
         <div className="flex items-center gap-1.5 text-turquoise">
-          <span className="font-mono text-sm">Featured Work</span>
+          <span className="font-mono text-sm">{UI_COPY[locale].featuredWorks.featuredWorkBadge}</span>
           <SparkleIcon className="h-5 w-5" />
         </div>
         <div className="flex items-baseline justify-between gap-4">
@@ -80,6 +83,7 @@ export function FeaturedCard({ item, active }: { item: ProjectItem; active: bool
  *  just the one with scroll focus. Kept as its own component rather than
  *  a variant prop on FeaturedCard so desktop's markup stays untouched. */
 export function FeaturedCardMobile({ item }: { item: ProjectItem }) {
+  const { locale } = useLocale();
   return (
     <a href={item.link} target="_blank" rel="noopener noreferrer" className="flex flex-col gap-4">
       <div className="relative w-full overflow-hidden rounded-[24px] [aspect-ratio:4/3]">
@@ -87,7 +91,7 @@ export function FeaturedCardMobile({ item }: { item: ProjectItem }) {
       </div>
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-1.5 text-turquoise">
-          <span className="font-mono text-sm">Featured Work</span>
+          <span className="font-mono text-sm">{UI_COPY[locale].featuredWorks.featuredWorkBadge}</span>
           <SparkleIcon className="h-5 w-5" />
         </div>
         <div className="flex items-baseline justify-between gap-4">

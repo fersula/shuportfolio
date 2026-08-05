@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "@/lib/gsap";
+import { useLocale } from "@/lib/i18n/locale-context";
+import { UI_COPY } from "@/lib/i18n/ui-copy";
 
 type NavItem = {
   num: string;
@@ -14,23 +16,30 @@ type NavItem = {
   trackIds?: string[];
 };
 
-const ITEMS: NavItem[] = [
-  { num: "01", label: "Shu's Mindspace", id: "hero" },
-  { num: "02", label: "Manifesto", id: "manifesto" },
-  { num: "03", label: "Intro", id: "intro" },
+// `label` here is the English fallback and the key structure other logic
+// (targetsRef/currentRef sizing, scrollspy tracking) is built around — the
+// actual displayed text comes from UI_COPY.nav via navKey at render time,
+// so ITEMS itself stays locale-agnostic and every id/ref/effect above is
+// unaffected by which language is active.
+const ITEMS: (NavItem & { navKey: keyof typeof UI_COPY.en.nav })[] = [
+  { num: "01", label: "Shu's Mindspace", id: "hero", navKey: "hero" },
+  { num: "02", label: "Manifesto", id: "manifesto", navKey: "manifesto" },
+  { num: "03", label: "Intro", id: "intro", navKey: "intro" },
   {
     num: "04",
     label: "Featured Works",
     id: "featured-works",
     trackIds: ["featured-works-teaser"],
+    navKey: "featuredWorks",
   },
   {
     num: "05",
     label: "Refraction Lab",
     id: "refraction-lab",
     trackIds: ["refraction-lab-teaser"],
+    navKey: "refractionLab",
   },
-  { num: "06", label: "Contact Me", id: "contact" },
+  { num: "06", label: "Contact Me", id: "contact", navKey: "contact" },
 ];
 
 /* pointer-proximity falloff, matching reactbits LineSidebar's "smooth" curve */
@@ -51,6 +60,7 @@ const SMOOTHING_MS = 120; // exponential-smoothing time constant for --effect
  * small horizontal shift together via CSS, no separate indicator line.
  */
 export function IndexSidebar() {
+  const { locale } = useLocale();
   const outerRef = useRef<HTMLDivElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
   const rowsRef = useRef<HTMLDivElement>(null);
@@ -326,7 +336,7 @@ export function IndexSidebar() {
                 <span className="sidebar-marker h-px shrink-0" />
                 <span className="sidebar-index font-mono text-xs">{item.num}</span>
                 <span className="sidebar-label font-mono text-sm whitespace-nowrap">
-                  {item.label}
+                  {UI_COPY[locale].nav[item.navKey]}
                 </span>
               </span>
             </div>

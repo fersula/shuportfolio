@@ -5,10 +5,12 @@ import { FeaturedWorks } from "@/components/sections/featured-works";
 import { RefractionLab } from "@/components/sections/refraction-lab/refraction-lab";
 import { Contact } from "@/components/sections/contact";
 import { IndexSidebar } from "@/components/nav/index-sidebar";
+import { LanguageToggle } from "@/components/nav/language-toggle";
 
 export default function Home() {
   return (
     <main>
+      <LanguageToggle />
       <IndexSidebar />
       <Hero />
       <Manifesto />

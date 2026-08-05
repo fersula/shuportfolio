@@ -5,6 +5,8 @@ import { motion } from "framer-motion";
 import { FRAGMENTS, LAYERS } from "./field-data";
 import { EASE } from "@/lib/motion";
 import type { PointerState } from "./use-pointer";
+import { useLocale } from "@/lib/i18n/locale-context";
+import { UI_COPY } from "@/lib/i18n/ui-copy";
 
 /* extra reach beyond the word's own box for the proximity focus */
 const FOCUS_PADDING = 56;
@@ -14,6 +16,7 @@ export function FloatingWords({
 }: {
   pointerRef: RefObject<PointerState>;
 }) {
+  const { locale } = useLocale();
   const rootRef = useRef<HTMLDivElement>(null);
   const wrapRefs = useRef(new Map<string, HTMLDivElement>());
   const nodeRefs = useRef(new Map<string, HTMLSpanElement>());
@@ -133,7 +136,7 @@ export function FloatingWords({
                       } as React.CSSProperties
                     }
                   >
-                    {f.text}
+                    {UI_COPY[locale].heroWords[f.id] ?? f.text}
                   </span>
                 </span>
               </motion.div>

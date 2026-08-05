@@ -6,45 +6,8 @@ import { EASE } from "@/lib/motion";
 import { gsap } from "@/lib/gsap";
 import { BorderGlow } from "@/components/ui/border-glow";
 import { useIsMobile } from "@/lib/use-is-mobile";
-
-type Tab = {
-  key: string;
-  label: string;
-  text: string;
-};
-
-const TABS: Tab[] = [
-  {
-    key: "anyone",
-    label: "For anyone",
-    text: "I design and build AI-powered experiences that turn emerging technologies into something people can actually feel, use, and understand.",
-  },
-  {
-    key: "founders",
-    label: "founders",
-    text: "I help turn ambiguous ideas into sharp product hypotheses, then make them tangible through fast, testable prototypes.",
-  },
-  {
-    key: "recruiters",
-    label: "recruiters",
-    text: "5+ years across AI, UX, prototyping and emerging technology projects. Strong in product thinking, interaction design, and AI-assisted building.",
-  },
-  {
-    key: "designers",
-    label: "designers",
-    text: "I care deeply about the human side of technology — and about translating abstract ideas into clear product behavior and interactions.",
-  },
-  {
-    key: "product-managers",
-    label: "product managers",
-    text: "My strength is identifying the real problem behind the brief, framing solution hypotheses, and shaping product behavior from insight to prototype.",
-  },
-  {
-    key: "engineers",
-    label: "engineers",
-    text: "I work at the boundary of product, design, and implementation — defining system logic, interaction flows, and using AI-assisted tools to quickly build and test ideas.",
-  },
-];
+import { useLocale } from "@/lib/i18n/locale-context";
+import { UI_COPY } from "@/lib/i18n/ui-copy";
 
 /**
  * The bio paragraph is rendered twice, stacked: a dim base copy (70% white)
@@ -123,6 +86,8 @@ function SpotlightText({ text }: { text: string }) {
 }
 
 export function Intro() {
+  const { locale } = useLocale();
+  const TABS = UI_COPY[locale].intro.tabs;
   const [active, setActive] = useState(TABS[0].key);
   const activeTab = TABS.find((t) => t.key === active) ?? TABS[0];
   const cardRef = useRef<HTMLDivElement>(null);
@@ -290,11 +255,10 @@ export function Intro() {
       <div className="flex flex-col justify-center px-gutter pb-[80px] pt-0 md:min-h-svh md:py-section lg:pl-[380px] lg:pr-gutter">
         <div id="featured-works-teaser" ref={teaserRef} className="max-w-2xl">
           <h2 className="font-mono text-base tracking-[0.04em] text-blue md:text-lg">
-            Featured Works
+            {UI_COPY[locale].intro.featuredTeaserHeading}
           </h2>
           <p className="mt-5 font-sans text-[24px] leading-relaxed text-paper">
-            My projects may span automotive, emotion AI, culture and travel. But
-            they all explore different forms of human connection.
+            {UI_COPY[locale].intro.featuredTeaserBody}
           </p>
         </div>
       </div>

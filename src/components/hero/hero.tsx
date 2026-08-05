@@ -9,8 +9,11 @@ import { TextPressure } from "./text-pressure";
 import { usePointer } from "./use-pointer";
 import { EASE } from "@/lib/motion";
 import { gsap } from "@/lib/gsap";
+import { useLocale } from "@/lib/i18n/locale-context";
+import { UI_COPY } from "@/lib/i18n/ui-copy";
 
 export function Hero() {
+  const { locale } = useLocale();
   const sectionRef = useRef<HTMLElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const prismRef = useRef<HTMLDivElement>(null);
@@ -135,7 +138,7 @@ export function Hero() {
               }}
             />
           </span>
-          Scroll
+          {UI_COPY[locale].hero.scroll}
         </motion.div>
       </div>
 

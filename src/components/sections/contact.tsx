@@ -2,6 +2,8 @@
 
 import { useEffect, useRef } from "react";
 import { gsap } from "@/lib/gsap";
+import { useLocale } from "@/lib/i18n/locale-context";
+import { UI_COPY } from "@/lib/i18n/ui-copy";
 
 const EMAIL = "fersulafu@gmail.com";
 const LINKEDIN_URL = "https://www.linkedin.com/in/shu-fu-suu/";
@@ -41,6 +43,7 @@ function InstagramIcon() {
  * here as the "signing off" beat of the page.
  */
 export function Contact() {
+  const { locale } = useLocale();
   const sectionRef = useRef<HTMLElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -83,8 +86,7 @@ export function Contact() {
             className="mb-6 h-[100px] w-[100px] rounded-full object-cover"
           />
           <p className="font-sans text-[24px] leading-relaxed text-paper">
-            If any of this resonates, I&rsquo;d love to hear from you &mdash;
-            reach out to talk design, ideas, or connection.
+            {UI_COPY[locale].contact.body}
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-4">

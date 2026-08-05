@@ -2,6 +2,8 @@
 
 import { useEffect, useRef } from "react";
 import { gsap } from "@/lib/gsap";
+import { useLocale } from "@/lib/i18n/locale-context";
+import { UI_COPY } from "@/lib/i18n/ui-copy";
 
 /**
  * The Manifesto: two stacked convictions, set to the right of the fixed
@@ -10,6 +12,8 @@ import { gsap } from "@/lib/gsap";
  * Hero's own scroll-out crossfade rather than a separate reveal.
  */
 export function Manifesto() {
+  const { locale } = useLocale();
+  const copy = UI_COPY[locale].manifesto;
   const sectionRef = useRef<HTMLElement>(null);
   const wonderRef = useRef<HTMLDivElement>(null);
   const callingRef = useRef<HTMLDivElement>(null);
@@ -46,21 +50,19 @@ export function Manifesto() {
       <div className="flex flex-col justify-center px-gutter py-[80px] md:min-h-svh md:py-section lg:pl-[380px] lg:pr-gutter">
         <div ref={wonderRef} className="max-w-2xl">
           <h2 className="font-mono text-base tracking-[0.04em] text-blue md:text-lg">
-            I wonder why
+            {copy.wonderHeading}
           </h2>
           <p className="mt-5 font-sans text-[24px] leading-relaxed text-paper sm:text-[32px]">
-            The more advanced our technology becomes, the more I wonder why
-            people still feel disconnected.
+            {copy.wonderBody}
           </p>
         </div>
 
         <div ref={callingRef} className="mt-16 max-w-2xl md:mt-24">
           <h2 className="font-mono text-base tracking-[0.04em] text-[#D0634D] md:text-lg">
-            My sincere calling
+            {copy.callingHeading}
           </h2>
           <p className="mt-5 font-sans text-[24px] leading-relaxed text-paper sm:text-[32px]">
-            I use emerging technology to help people feel more understood,
-            and more connected to themselves, others, and the world.
+            {copy.callingBody}
           </p>
         </div>
       </div>

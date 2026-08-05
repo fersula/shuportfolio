@@ -6,6 +6,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import { EASE } from "@/lib/motion";
 import { NODE_TYPE_META, type LabNode } from "@/lib/refraction-lab-data";
 import { NodeMarker } from "./node-marker";
+import { useLocale } from "@/lib/i18n/locale-context";
+import { UI_COPY } from "@/lib/i18n/ui-copy";
+import { LAB_NODE_COPY } from "@/lib/i18n/refraction-lab-copy";
 
 const SLIDE_MS = 2000;
 
@@ -81,6 +84,10 @@ function Field({ icon, title, children }: { icon: string; title: string; childre
 }
 
 export function DetailPanel({ node, onClose }: { node: LabNode | null; onClose: () => void }) {
+  const { locale } = useLocale();
+  const copy = UI_COPY[locale].refractionLab.detailPanel;
+  const nodeCopy = node ? LAB_NODE_COPY[node.id][locale] : null;
+
   useEffect(() => {
     if (!node) return;
     function onKey(e: KeyboardEvent) {
@@ -109,7 +116,7 @@ export function DetailPanel({ node, onClose }: { node: LabNode | null; onClose: 
             key="panel"
             role="dialog"
             aria-modal="true"
-            aria-label={node.label}
+            aria-label={nodeCopy!.label}
             className="fixed right-0 top-0 z-50 h-svh w-full overflow-y-auto bg-ink-soft shadow-[-24px_0_60px_rgba(0,0,0,0.5)] md:w-[35%] md:min-w-[420px]"
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
@@ -119,7 +126,7 @@ export function DetailPanel({ node, onClose }: { node: LabNode | null; onClose: 
             <button
               type="button"
               onClick={onClose}
-              aria-label="Close"
+              aria-label={copy.close}
               className="absolute right-5 top-5 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-ink/70 font-mono text-paper-dim backdrop-blur transition-colors hover:text-paper"
             >
               ×
@@ -130,23 +137,23 @@ export function DetailPanel({ node, onClose }: { node: LabNode | null; onClose: 
             <div className="flex flex-col gap-8 px-8 py-8">
               <div>
                 <div className="flex items-baseline justify-between gap-4">
-                  <h2 className="font-sans text-2xl font-bold text-paper">{node.label}</h2>
+                  <h2 className="font-sans text-2xl font-bold text-paper">{nodeCopy!.label}</h2>
                   <span className="font-mono text-xs text-paper-dim">{node.year}</span>
                 </div>
 
                 <div className="mt-4">
                   <span className="font-mono text-[11px] uppercase tracking-[0.08em] text-paper-faint">
-                    Status
+                    {copy.status}
                   </span>
-                  <p className="mt-1 font-sans text-sm text-paper-dim">{node.status}</p>
+                  <p className="mt-1 font-sans text-sm text-paper-dim">{nodeCopy!.status}</p>
                 </div>
 
                 <div className="mt-4">
                   <span className="font-mono text-[11px] uppercase tracking-[0.08em] text-paper-faint">
-                    Related
+                    {copy.related}
                   </span>
                   <p className="mt-1 font-sans text-sm text-paper-dim">
-                    {node.relatedTags.join(" · ")}
+                    {nodeCopy!.relatedTags.join(" · ")}
                   </p>
                 </div>
               </div>
@@ -154,9 +161,9 @@ export function DetailPanel({ node, onClose }: { node: LabNode | null; onClose: 
               <div className="h-px w-full bg-paper-faint/25" />
 
               <div className="flex flex-col gap-6">
-                {node.sections.map((section) => (
-                  <Field key={section.title} icon={section.icon} title={section.title}>
-                    {section.body}
+                {node.sections.map((section, i) => (
+                  <Field key={section.title} icon={section.icon} title={nodeCopy!.sections[i].title}>
+                    {nodeCopy!.sections[i].body}
                   </Field>
                 ))}
               </div>
@@ -165,10 +172,10 @@ export function DetailPanel({ node, onClose }: { node: LabNode | null; onClose: 
 
               <div>
                 <span className="font-mono text-[11px] uppercase tracking-[0.08em] text-paper-faint">
-                  Status
+                  {copy.status}
                 </span>
                 <ul className="mt-2 flex flex-col gap-1.5">
-                  {node.statusChecklist.map((item) => (
+                  {node.statusChecklist.map((item, i) => (
                     <li
                       key={item.label}
                       className="flex items-center gap-2 font-sans text-sm text-paper-dim"
@@ -176,7 +183,7 @@ export function DetailPanel({ node, onClose }: { node: LabNode | null; onClose: 
                       <span aria-hidden style={{ color: item.state === "done" ? "var(--color-emerald)" : color }}>
                         {item.state === "done" ? "✅" : "🔵"}
                       </span>
-                      {item.label}
+                      {nodeCopy!.statusChecklist[i].label}
                     </li>
                   ))}
                 </ul>
