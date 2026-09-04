@@ -10,11 +10,11 @@ import { UI_COPY } from "@/lib/i18n/ui-copy";
 import { PROJECTS_COPY } from "@/lib/i18n/projects-copy";
 
 // Single source of truth for project content. `worktype` documents each
-// project's canonical role, but doesn't drive rendering directly — the same
-// project can appear as a big Featured card under its own category and as a
-// small Related card under a different one (e.g. COMAI is Featured under
-// Technology, Related under Self), so which category shows which card is
-// controlled separately below by SECTIONS.
+// project's canonical role, but doesn't drive rendering directly — a
+// project could in principle appear as a big Featured card under its own
+// category and as a small Related card under a different one (no current
+// project does), so which category shows which card is controlled
+// separately below by SECTIONS.
 type WorkType = "Featured" | "Related";
 
 const PROJECTS: Record<string, ProjectItem & { worktype: WorkType }> = {
@@ -24,7 +24,7 @@ const PROJECTS: Record<string, ProjectItem & { worktype: WorkType }> = {
     projectName: "COMAI",
     year: "2023-2025",
     title: "How can AI feel thoughtful—not merely capable?",
-    subtitle: "Future automotive AI experiences, Strategy · Embodied AI · Two-stage PoC",
+    subtitle: "2030 Future automotive AI experiences for Honda, Strategy · Embodied AI · Two-stage PoC",
     link: "https://fushu.framer.website/auto",
     worktype: "Featured",
   },
@@ -47,7 +47,7 @@ const PROJECTS: Record<string, ProjectItem & { worktype: WorkType }> = {
     subtitle:
       "Emotion AI venture, SER-powered AI prototype, venture strategy",
     link: "https://fushu.framer.website/semo",
-    worktype: "Featured",
+    worktype: "Related",
   },
   elgana: {
     id: "elgana",
@@ -104,18 +104,29 @@ const PROJECTS: Record<string, ProjectItem & { worktype: WorkType }> = {
     link: "https://fushu.framer.website/iverse",
     worktype: "Related",
   },
+  kado: {
+    id: "kado",
+    src: "/thumbnails/kado.png",
+    projectName: "Kado",
+    year: "2026",
+    title: "What can the things we want reveal about who we are??",
+    subtitle: "An independently built social product, developed by a designer and engineer from 0-1.",
+    link: "https://www.kado.spot/",
+    worktype: "Featured",
+  },
 };
 
 // Stacked vertically in this order — each section is one category's
-// Featured card + its two Related cards. A project's Related pairing isn't
-// derivable from a single field (e.g. Matsudo MetaCity is Related under
-// both Technology and Culture&Places, and COMAI/SEMO double as a Related
-// card under a category other than their own Featured one), so it's an
-// explicit table.
-const SECTIONS: { category: string; featured: string; related: [string, string] }[] = [
-  { category: "Technology", featured: "auto", related: ["semo", "metamatsu"] },
+// Featured card + 0-2 Related cards (Technology currently has none;
+// Self has one). A project's Related pairing isn't derivable from a
+// single field — a project could in principle be Related under more than
+// one category, or double as Related under a category other than its own
+// Featured one — so it's an explicit table rather than derived from
+// `worktype`.
+const SECTIONS: { category: string; featured: string; related: string[] }[] = [
+  { category: "Technology", featured: "auto", related: [] },
   { category: "Culture&Places", featured: "sere", related: ["chimon", "metamatsu"] },
-  { category: "Self", featured: "semo", related: ["auto", "metabond"] },
+  { category: "Self", featured: "kado", related: ["semo"] },
   { category: "Others", featured: "elgana", related: ["iverse", "metabond"] },
 ];
 
@@ -304,7 +315,7 @@ export function FeaturedWorks() {
                   ref={(el) => {
                     sectionRefs.current[i] = el;
                   }}
-                  className="flex flex-col py-10"
+                  className="flex min-h-svh flex-col justify-center py-10"
                 >
                   <FeaturedCard item={featured} active={active} />
                   <div className={`related-accordion mt-12 ${active ? "is-open" : ""}`}>
@@ -312,6 +323,9 @@ export function FeaturedWorks() {
                       {related.map((item) => (
                         <RelatedCard key={item.id} item={item} />
                       ))}
+                      {/* keeps a lone related card at its normal half-width
+                          instead of flex-1 stretching it to fill the row */}
+                      {related.length === 1 && <div className="flex-1" aria-hidden />}
                     </div>
                   </div>
                 </div>

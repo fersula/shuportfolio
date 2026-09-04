@@ -64,11 +64,11 @@ export function FeaturedCard({ item, active }: { item: ProjectItem; active: bool
           <span className="font-mono text-xs text-paper-dim">{item.year}</span>
         </div>
         <p className="font-sans text-base font-medium leading-snug text-paper">{item.title}</p>
-        {/* subtitle + divider: hidden until real hover, independent of
-            `active` — the active section's panel is forced open above, but
-            this pair stays hover-only even then (see reference screenshot:
-            the active/open SerenChina card shows no subtitle until hovered) */}
-        <div className="flex flex-col gap-2 opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100">
+        {/* subtitle + divider: always shown alongside the rest of the panel
+            (no separate hover gate) — only the panel itself is hover/active
+            gated, per direct feedback that the Featured card's subtitle
+            should be permanent, unlike the small Related cards below. */}
+        <div className="flex flex-col gap-2">
           <div className="h-px w-full bg-paper-faint/40" />
           <p className="font-sans text-xs leading-snug text-paper-dim">{item.subtitle}</p>
         </div>

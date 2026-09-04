@@ -88,4 +88,14 @@ export const PROJECTS_COPY: Record<
       subtitle: "从 0 到 1 的 AI 社交平台，用户体验设计、动效与品牌",
     },
   },
+  kado: {
+    en: {
+      title: "What can the things we want reveal about who we are??",
+      subtitle: "An independently built social product, developed by a designer and engineer from 0-1.",
+    },
+    zh: {
+      title: "我们想要的东西，能揭示出我们是谁吗？",
+      subtitle: "独立开发的社交产品，由一名设计师和一名工程师从 0 到 1 打造",
+    },
+  },
 };
