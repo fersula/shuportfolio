@@ -1,0 +1,1288 @@
+/* Refract Story — long-form essay page.
+ *
+ * Design contract, deliberately narrow so the page stays quiet:
+ *
+ * - NO cards. Structure comes from a two-column grid (mono label rail +
+ *   prose column), hairlines and type scale. The only exception is the
+ *   prism diagram in ch.01. This mirrors Manifesto (pure text) and
+ *   Refraction Lab (one frame, no chrome) rather than inventing a card
+ *   language this site doesn't otherwise have.
+ * - The spectrum (emerald → blue → gold) appears in exactly four places:
+ *   the hero rule, the rule above each chapter's closing conviction, the
+ *   fixed scroll-progress line, and the ch.01 prism rays. Terracotta is
+ *   reserved for the chapter eyebrows + index, matching the site's rule
+ *   that terracotta = navigation/index accent.
+ * - Five type levels only: eyebrow (mono caps) / statement (mono, large) /
+ *   lede (sans, bright) / body (sans, recessive) / label (mono caps small).
+ */
+
+.refract-page {
+  /* content measure + the rail that carries mono labels */
+  /* 42rem === Tailwind max-w-2xl, the width Manifesto/Intro/teaser use */
+  --rf-column: 42rem;
+  --rf-rail: 148px;
+  --rf-rail-gap: 2.5rem;
+  /* prose measure: a flat px value, not em — an em measure silently
+     changed width whenever a block's own font-size did */
+  --rf-measure: 640px;
+
+  /* body copy sits brighter than --color-paper-dim: this page is a long
+     read, and paper-dim (#a8a6a0) is tuned for short captions elsewhere. */
+  --rf-body: color-mix(in oklab, var(--color-paper-dim) 55%, var(--color-paper));
+  --rf-hair: color-mix(in oklab, var(--color-paper-faint) 45%, transparent);
+  --rf-spectrum: linear-gradient(
+    90deg,
+    var(--color-emerald),
+    var(--color-blue) 45%,
+    var(--color-gold)
+  );
+
+  position: relative;
+  min-height: 100vh;
+  overflow-x: clip;
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+
+/* One faint, static wash. No competing radial gradients. */
+.refract-wash {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 80% 55% at 68% 0%,
+    rgba(77, 133, 215, 0.07),
+    transparent 70%
+  );
+}
+
+/* ---------- scroll progress: a 1px spectrum line at the right edge ---------- */
+
+.refract-progress {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 40;
+  width: 1px;
+  height: 100vh;
+  background: var(--rf-hair);
+  pointer-events: none;
+}
+
+.refract-progress__fill {
+  height: calc(var(--rf-progress, 0) * 100%);
+  overflow: hidden;
+}
+
+/* full-viewport-height child inside a clipping parent, so the gradient is
+   revealed rather than squashed as progress grows */
+.refract-progress__fill::before {
+  content: "";
+  display: block;
+  width: 1px;
+  height: 100vh;
+  background: linear-gradient(
+    180deg,
+    var(--color-emerald),
+    var(--color-blue) 45%,
+    var(--color-gold)
+  );
+  opacity: 0.9;
+}
+
+/* ---------- home link ---------- */
+
+.refract-home-link {
+  position: fixed;
+  top: 2rem;
+  left: clamp(1.5rem, 5vw, 4rem);
+  z-index: 55;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-family: var(--font-jetbrains-mono);
+  font-size: 0.76rem;
+  letter-spacing: 0.04em;
+  color: var(--color-paper-faint);
+  transition: color 300ms var(--ease-settle);
+}
+
+.refract-home-link:hover {
+  color: var(--color-terracotta);
+}
+
+/* sized in em so the icon tracks the link's own font-size */
+.refract-home-link__icon {
+  width: 1.05em;
+  height: 1.05em;
+  flex: none;
+}
+
+/* ---------- page shell + shared column ---------- */
+
+.refract-hero,
+.refract-section {
+  position: relative;
+  z-index: 2;
+  padding-inline: var(--spacing-gutter);
+}
+
+/* 380px matches the home page's own `lg:pl-[380px]` on Manifesto, Intro
+   and the Featured Works teaser, so this essay's text sits on exactly the
+   same vertical axis as the rest of the site — and clears the fixed index
+   (which ends around 302px) by the same margin the home page does. */
+@media (min-width: 1024px) {
+  .refract-hero,
+  .refract-section {
+    padding-left: 380px;
+  }
+}
+
+.refract-hero > *,
+.refract-section > * {
+  width: min(var(--rf-column), 100%);
+  margin-inline: auto;
+}
+
+@media (min-width: 1024px) {
+  .refract-hero > *,
+  .refract-section > * {
+    /* nudge the column off dead-centre so it reads as set against the
+       index rather than floating in the middle of the viewport */
+    margin-inline: 0 auto;
+    max-width: var(--rf-column);
+  }
+}
+
+.refract-section {
+  padding-block: clamp(6rem, 15vh, 11rem);
+  scroll-margin-top: 3rem;
+}
+
+/* ---------- type scale ---------- */
+
+.rf-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  font-family: var(--font-jetbrains-mono);
+  font-size: 0.875rem; /* 14px */
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-terracotta);
+}
+
+.rf-eyebrow i {
+  width: 26px;
+  height: 1px;
+  flex: none;
+  background: currentColor;
+  opacity: 0.55;
+}
+
+/* DM Sans, matching the page title — mono's -0.045em is far too tight for
+   a geometric sans, so the tracking is reset with the typeface */
+.rf-statement {
+  margin-top: 1.9rem;
+  font-family: var(--font-dm-sans);
+  font-size: clamp(1.6rem, 2.5vw, 2.35rem);
+  font-weight: 500;
+  line-height: 1.18;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+  color: var(--color-paper);
+}
+
+/* the statement type opening a block partway down a section, rather than
+   following its chapter eyebrow — so it needs a section-internal heading's
+   top rhythm instead of the 1.9rem that sits under an eyebrow */
+.rf-statement--sub {
+  margin-top: clamp(3rem, 7.5vh, 5rem);
+}
+
+.rf-lede {
+  max-width: 30em;
+  margin-top: 1.6rem;
+  font-family: var(--font-dm-sans);
+  font-size: clamp(1.15rem, 1.5vw, 1.4rem);
+  line-height: 1.55;
+  color: var(--color-paper);
+}
+
+.rf-body {
+  max-width: var(--rf-measure);
+  margin-top: 1.5rem;
+  font-family: var(--font-dm-sans);
+  font-size: 1rem;
+  line-height: 1.78;
+  color: var(--rf-body);
+}
+
+.rf-body + .rf-body {
+  margin-top: 1.1rem;
+}
+
+.rf-body strong {
+  font-weight: 500;
+  color: var(--color-paper);
+}
+
+/* body copy opening a block partway down a section: it needs a
+   section-internal heading's top rhythm, not the 1.5rem a paragraph gets
+   when it simply follows another paragraph */
+.rf-body--standalone {
+  margin-top: clamp(3rem, 7.5vh, 5rem);
+}
+
+/* a short assertion closing out a spec row — body scale, but it steps up to
+   paper white so it reads as the point rather than more explanation */
+.rf-body--point {
+  margin-top: 0.9rem;
+  color: var(--color-paper);
+}
+
+.rf-label {
+  font-family: var(--font-jetbrains-mono);
+  font-size: 0.75rem; /* 12px floor */
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-paper-faint);
+}
+
+/* a label used as a section-internal heading rather than inline */
+.rf-label--standalone {
+  display: block;
+  margin-top: clamp(3rem, 7.5vh, 5rem);
+}
+
+/* same, for a lede that introduces a block partway down a section instead
+   of following its statement */
+.rf-lede--standalone {
+  margin-top: clamp(3rem, 7.5vh, 5rem);
+}
+
+/* a lede closing out a figure: the figure below it carries its own weight,
+   so this needs more air above than the 1.6rem a lede gets under a heading */
+.rf-lede--afterfigure {
+  margin-top: clamp(2rem, 4vh, 2.75rem);
+}
+
+.rf-note {
+  max-width: var(--rf-measure);
+  margin-top: 1.6rem;
+  font-family: var(--font-dm-sans);
+  font-size: 0.95rem;
+  font-style: italic;
+  line-height: 1.7;
+  color: var(--color-paper-faint);
+}
+
+/* ---------- hero ---------- */
+
+.refract-hero {
+  display: flex;
+  min-height: 100svh;
+  flex-direction: column;
+  justify-content: center;
+  padding-top: 9rem;
+  padding-bottom: clamp(5rem, 12vh, 8rem);
+}
+
+.refract-hero__kicker {
+  margin-bottom: 1.5rem;
+  font-family: var(--font-jetbrains-mono);
+  font-size: 0.875rem; /* 14px */
+  /* mixed case, so it takes lighter tracking than the page's caps labels */
+  letter-spacing: 0.08em;
+  /* 70% of the accent rather than opacity on the element, so the colour
+     mixes against the page ink instead of the line going translucent */
+  color: color-mix(in oklab, var(--color-terracotta) 70%, transparent);
+}
+
+.refract-hero h1 {
+  font-family: var(--font-dm-sans);
+  font-size: clamp(2.3rem, 5.2vw, 4.25rem);
+  font-weight: 500;
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.refract-hero__rule {
+  height: 1px;
+  margin-top: clamp(2rem, 5vh, 3.25rem);
+  background: var(--rf-spectrum);
+  opacity: 0.8;
+  mask-image: linear-gradient(90deg, #000 0%, #000 55%, transparent 100%);
+}
+
+/* with a one-word title, this line carries the whole premise — it sits at
+   the same scale as a chapter lede rather than as quiet standfirst copy */
+.refract-hero__subtitle {
+  max-width: var(--rf-measure);
+  margin-top: 1.6rem;
+  font-family: var(--font-dm-sans);
+  font-size: clamp(1.15rem, 1.5vw, 1.4rem);
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  color: var(--color-paper);
+}
+
+/* metadata, not prose: it gets the full column so the date doesn't orphan
+   onto a second line at desktop widths */
+.refract-hero__byline {
+  max-width: none;
+  margin-top: 1.5rem;
+  font-family: var(--font-dm-sans);
+  font-size: 0.875rem; /* 14px */
+  font-style: italic;
+  line-height: 1.65;
+  color: var(--color-paper-faint);
+}
+
+/* ---------- the one repeating structural pattern: a spec row ----------
+   mono label in the left rail, prose in the right column, hairline above.
+   Used by ch.00's timeline, ch.02's pipeline, ch.03's algorithm + states,
+   ch.04's layers, ch.05's shifts and ch.06's principles — deliberately the
+   same shape every time instead of a new card style per section. */
+
+.rf-rows {
+  margin-top: clamp(2.75rem, 6vh, 4.25rem);
+}
+
+.rf-rows--tight {
+  margin-top: 2rem;
+}
+
+/* a run of plain paragraphs standing on its own between two blocks —
+   same top rhythm as .rf-rows so the section's spacing stays even */
+.rf-passage {
+  margin-top: clamp(2.75rem, 6vh, 4.25rem);
+}
+
+.rf-passage > .rf-body:first-child {
+  margin-top: 0;
+}
+
+.rf-row {
+  display: grid;
+  grid-template-columns: var(--rf-rail) minmax(0, 1fr);
+  gap: 0 var(--rf-rail-gap);
+  padding-block: 1.9rem;
+  border-top: 1px solid var(--rf-hair);
+}
+
+.rf-rows > .rf-row:last-child {
+  border-bottom: 1px solid var(--rf-hair);
+}
+
+.rf-row__label {
+  font-family: var(--font-jetbrains-mono);
+  font-size: 0.75rem; /* 12px floor */
+  line-height: 1.7;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-terracotta);
+}
+
+.rf-row__label b {
+  display: block;
+  font-weight: 400;
+  color: var(--color-paper-faint);
+}
+
+/* ch.03's step rails read as names rather than filing codes, so they step
+   up from the 12px caps the other rows use — and where a step still carries
+   a number above it, that number takes the same treatment. */
+.rf-rows--steps .rf-row__label {
+  font-size: 1.05rem; /* 16.8px */
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.rf-rows--steps .rf-row__label b {
+  display: inline; /* number and name read as one line, not stacked */
+  margin-left: 0.45rem;
+  color: inherit; /* terracotta, not the paper-faint the numbered rails use */
+}
+
+/* "03 Triangulate" needs ~150px at 16.8px mono — wider than the 148px rail
+   the numbered rows use. Scoped to >=768px so it can't defeat the
+   single-column stacking below that. */
+@media (min-width: 768px) {
+  .rf-rows--steps {
+    --rf-rail: 176px;
+  }
+
+  /* ch.05's rails run longer than 176px ("02 Intelligence target" needs
+     ~219px). max-content sizes the column to whatever the longest label
+     is, so these stay on one line without a hardcoded width to maintain.
+     Scoped to this one block: giving every steps table an auto rail would
+     leave each one a different width and break the alignment between the
+     tables that sit in the same section. */
+  .rf-rows--rail-auto {
+    --rf-rail: max-content;
+  }
+}
+
+.rf-row__body > h3 {
+  font-family: var(--font-jetbrains-mono);
+  font-size: 1.05rem;
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  color: var(--color-paper);
+}
+
+.rf-row__body > h3 + .rf-body,
+.rf-row__body > h3 + .rf-inline-list,
+.rf-row__body > h3 + .rf-quotes,
+.rf-row__body > h3 + .rf-spec {
+  margin-top: 0.85rem;
+}
+
+.rf-row__body > .rf-body:first-child {
+  margin-top: 0;
+}
+
+/* ---------- inline lists (signals, layer criteria) ---------- */
+
+.rf-inline-list {
+  max-width: var(--rf-measure);
+  font-family: var(--font-dm-sans);
+  font-size: 1rem;
+  line-height: 1.95;
+  color: var(--rf-body);
+}
+
+/* following a paragraph, the list needs its own air or it reads as one
+   more sentence rather than a separate enumeration */
+.rf-body + .rf-inline-list {
+  margin-top: 0.9rem;
+}
+
+.rf-inline-list span:not(:last-child)::after {
+  content: " · ";
+  color: var(--color-paper-faint);
+}
+
+/* ---------- ch.01: the prism figure ----------
+   public/prism.png carries the beam, the glass and the fan; the "ONE
+   PERSON" label and the three evidence labels are HTML beside it. The
+   three accent colours are sampled from that PNG's own bands, which is
+   why they are literals here rather than globals.css tokens — they belong
+   to this one image, not to the site palette.
+
+   Always side by side — the figure shrinks with the column rather than
+   dropping below the labels, so the beam→fan→labels reading order holds at
+   every width. Below 1280 the "ONE PERSON" tag sits above the image
+   instead of inline, so the shrinking image keeps the whole column. */
+
+.rf-prism {
+  --rf-conscious: #fec859;
+  --rf-revealed: #fd5b89;
+  --rf-latent: #30a3f3;
+
+  display: grid;
+  /* the figure column's share is the one knob for how big the prism reads —
+     lower the first number to shrink it, raise it to grow it */
+  grid-template-columns: minmax(0, 0.78fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 0 clamp(0.85rem, 2vw, 2.5rem);
+  margin: clamp(3rem, 7vh, 4.5rem) 0 0;
+}
+
+/* `isolation` + an explicit ink background give the image's `screen` blend
+   something to resolve against: the section's own stacking context paints
+   nothing behind it, so without this the blend is a no-op and the PNG's
+   #000 plate sits 5 levels darker than the page. */
+.rf-prism__figure {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  isolation: isolate;
+  background: var(--color-ink);
+}
+
+.rf-prism__source {
+  flex: none;
+  font-family: var(--font-jetbrains-mono);
+  font-size: 0.75rem; /* 12px floor */
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-paper-dim);
+}
+
+.rf-prism__img {
+  width: 100%;
+  height: auto;
+  mix-blend-mode: screen;
+}
+
+.rf-prism__labels {
+  display: grid;
+  gap: 1.25rem;
+}
+
+/* while the fan is small the bands can't key the labels on their own, so
+   each label carries a rule in its own colour */
+.rf-prism__label {
+  padding-left: 0.8rem;
+  border-left: 1px solid currentColor;
+}
+
+.rf-prism__label > span {
+  font-family: var(--font-jetbrains-mono);
+  font-size: 0.95rem;
+  letter-spacing: -0.01em;
+}
+
+.rf-prism__label > small {
+  display: block;
+  margin-top: 0.45rem;
+  font-family: var(--font-dm-sans);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--rf-body);
+}
+
+.rf-prism__label.is-conscious {
+  color: var(--rf-conscious);
+}
+.rf-prism__label.is-revealed {
+  color: var(--rf-revealed);
+}
+.rf-prism__label.is-latent {
+  color: var(--rf-latent);
+}
+
+.rf-prism__label.is-conscious > span {
+  color: var(--rf-conscious);
+}
+.rf-prism__label.is-revealed > span {
+  color: var(--rf-revealed);
+}
+.rf-prism__label.is-latent > span {
+  color: var(--rf-latent);
+}
+
+@media (min-width: 1280px) {
+  /* the figure is wider than the 640px prose measure: let it use the whole
+     width to the right of the fixed index, then the paragraph after it
+     returns to the measure */
+  .rf-prism {
+    width: min(1040px, calc(100vw - 380px - var(--spacing-gutter)));
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1fr);
+    align-items: center;
+    gap: 0 clamp(1.25rem, 2.5vw, 2.5rem);
+  }
+
+  .rf-prism__figure {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.9rem;
+  }
+
+  .rf-prism__img {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .rf-prism__labels {
+    gap: clamp(1.25rem, 3vh, 2rem);
+  }
+
+  /* beside the fan the bands themselves key the labels, so the rules go */
+  .rf-prism__label {
+    padding-left: 0;
+    border-left: 0;
+  }
+}
+
+/* ---------- ch.02: the three moments ----------
+   A chat exchange: state label, the speaker as an emoji, and what they said
+   in a speech bubble. The bubble is the one card-like surface on the page —
+   it earns it by being quoted speech, not chrome, and it stays on the
+   site's own raised-ink surface rather than introducing a new colour. */
+
+/* the three turns read as one exchange, so they share a single card. It
+   sits on --color-ink-soft with the bubbles a step above it on
+   --color-ink-raised: two surfaces already in the site's palette, so the
+   layering costs no new colour. */
+.rf-dialogue {
+  display: grid;
+  gap: clamp(1.25rem, 3vh, 1.75rem);
+  max-width: var(--rf-measure);
+  margin-top: 2rem;
+  padding: clamp(1.25rem, 3vw, 1.75rem);
+  border: 1px solid var(--rf-hair);
+  border-radius: 18px;
+  background: var(--color-ink-soft);
+}
+
+.rf-dialogue__when {
+  font-family: var(--font-dm-sans);
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--color-paper);
+}
+
+.rf-dialogue__row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  margin-top: 0.6rem;
+}
+
+/* padding-top lines the glyph up with the bubble's first line, which
+   `align-items: center` would lose as soon as a bubble wraps */
+.rf-dialogue__avatar {
+  flex: none;
+  padding-top: 0.25rem;
+  font-size: 1.4rem;
+  line-height: 1.2;
+}
+
+.rf-dialogue__bubble {
+  position: relative;
+  padding: 0.7rem 1.05rem;
+  border: 1px solid color-mix(in oklab, var(--color-paper-faint) 70%, transparent);
+  border-radius: 14px;
+  background: var(--color-ink-raised);
+  font-family: var(--font-dm-sans);
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--color-paper);
+}
+
+/* the tail: a square rotated 45° tucked under the bubble's left edge, so
+   only its two outer borders read */
+.rf-dialogue__bubble::before {
+  content: "";
+  position: absolute;
+  top: 14px;
+  left: -5px;
+  width: 9px;
+  height: 9px;
+  transform: rotate(45deg);
+  border-left: 1px solid color-mix(in oklab, var(--color-paper-faint) 70%, transparent);
+  border-bottom: 1px solid color-mix(in oklab, var(--color-paper-faint) 70%, transparent);
+  border-bottom-left-radius: 2px;
+  background: var(--color-ink-raised);
+}
+
+/* ---------- ch.02: the state table ----------
+   The page's only real table. Built from the same parts as everything else
+   — mono caps for the column heads, hairlines between rows, DM Sans in the
+   cells — so it reads as part of the system rather than a new component.
+   Below 640px it stops being a grid: each row becomes a stacked block with
+   its cells labelled from `data-label`, since three columns of prose do not
+   survive a phone. */
+
+.rf-table {
+  width: 100%;
+  margin-top: 2.25rem;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.rf-table thead th {
+  padding: 0 1.25rem 0.85rem 0;
+  border-bottom: 1px solid var(--rf-hair);
+  font-family: var(--font-jetbrains-mono);
+  font-size: 0.75rem; /* 12px floor */
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-paper-faint);
+}
+
+.rf-table tbody th,
+.rf-table td {
+  padding: 1.1rem 1.25rem 1.1rem 0;
+  border-bottom: 1px solid var(--rf-hair);
+  font-family: var(--font-dm-sans);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.55;
+  vertical-align: top;
+}
+
+/* the state itself is the row's key, so it carries the page's paper white */
+.rf-table tbody th {
+  width: 28%;
+  color: var(--color-paper);
+}
+
+.rf-table td {
+  width: 36%;
+  color: var(--rf-body);
+}
+
+.rf-table th:last-child,
+.rf-table td:last-child {
+  padding-right: 0;
+}
+
+@media (max-width: 639px) {
+  .rf-table,
+  .rf-table tbody,
+  .rf-table tr,
+  .rf-table tbody th,
+  .rf-table td {
+    display: block;
+    width: auto;
+  }
+
+  .rf-table thead {
+    display: none;
+  }
+
+  .rf-table tr {
+    padding-block: 1.25rem;
+    border-bottom: 1px solid var(--rf-hair);
+  }
+
+  .rf-table tr:first-child {
+    border-top: 1px solid var(--rf-hair);
+  }
+
+  .rf-table tbody th,
+  .rf-table td {
+    padding: 0;
+    border-bottom: 0;
+  }
+
+  .rf-table td {
+    margin-top: 0.7rem;
+  }
+
+  /* the column head each cell lost when the grid collapsed */
+  .rf-table td::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 0.15rem;
+    font-family: var(--font-jetbrains-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-paper-faint);
+  }
+}
+
+/* ---------- ch.03: evidence quotes + hypothesis spec ---------- */
+
+.rf-formula {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 0.5rem;
+  margin-top: 1.1rem;
+  font-family: var(--font-jetbrains-mono);
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+  color: var(--color-paper);
+}
+
+.rf-formula i {
+  font-style: normal;
+  color: var(--color-blue);
+}
+
+.rf-quotes {
+  display: grid;
+  gap: 0.8rem;
+  max-width: var(--rf-measure);
+  margin-top: 1.1rem;
+  padding-left: 1.4rem;
+  border-left: 1px solid var(--rf-hair);
+}
+
+.rf-quotes p {
+  font-family: var(--font-dm-sans);
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--rf-body);
+}
+
+.rf-quotes p span {
+  display: block;
+  font-family: var(--font-jetbrains-mono);
+  font-size: 0.75rem; /* 12px floor */
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-paper-faint);
+}
+
+.rf-quotes__out {
+  margin-top: 0.4rem;
+  font-family: var(--font-dm-sans);
+  font-size: 1.05rem;
+  line-height: 1.55;
+  color: var(--color-paper);
+}
+
+/* a small mono "spec sheet" — key on the left, value on the right */
+.rf-spec {
+  max-width: var(--rf-measure);
+  margin-top: 1.2rem;
+}
+
+.rf-spec > div {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr);
+  gap: 0 1rem;
+  padding-block: 0.7rem;
+  border-top: 1px solid var(--rf-hair);
+  font-family: var(--font-jetbrains-mono);
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+.rf-spec > div:last-child {
+  border-bottom: 1px solid var(--rf-hair);
+}
+
+.rf-spec dt {
+  font-size: 0.75rem; /* 12px floor */
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-paper-faint);
+}
+
+.rf-spec dd {
+  color: var(--color-paper);
+}
+
+.rf-spec dd em {
+  font-style: normal;
+  color: var(--color-emerald);
+}
+
+/* ---------- ch.04: introduction strategy triptych ---------- */
+
+.rf-strategy {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.75rem;
+  margin-top: clamp(2.5rem, 6vh, 3.75rem);
+}
+
+/* isolation + an ink background give each illustration's `screen` blend
+   something to resolve against — the PNGs are opaque #000 plates, which
+   would otherwise sit 5 levels darker than the page */
+.rf-strategy > div {
+  isolation: isolate;
+  padding-top: 1.1rem;
+  border-top: 1px solid currentColor;
+  background: var(--color-ink);
+}
+
+.rf-strategy__art {
+  display: block;
+  width: 100%;
+  max-width: 200px;
+  height: auto;
+  margin-bottom: 0.9rem;
+  mix-blend-mode: screen;
+}
+
+.rf-strategy .rf-strategy__n {
+  font-family: var(--font-jetbrains-mono);
+  font-size: 0.75rem; /* 12px floor */
+  letter-spacing: 0.14em;
+  color: currentColor;
+}
+
+.rf-strategy h4 {
+  margin-top: 1.4rem;
+  font-family: var(--font-jetbrains-mono);
+  font-size: 1.05rem;
+  font-weight: 400;
+  color: var(--color-paper);
+}
+
+.rf-strategy h4 em {
+  display: block;
+  margin-top: 0.25rem;
+  font-style: normal;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  color: currentColor;
+}
+
+.rf-strategy p {
+  margin-top: 0.9rem;
+  font-family: var(--font-dm-sans);
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: var(--rf-body);
+}
+
+.rf-strategy .is-mirror {
+  color: var(--color-blue);
+}
+.rf-strategy .is-complement {
+  color: var(--color-emerald);
+}
+.rf-strategy .is-prism {
+  color: var(--color-gold);
+}
+
+/* ---------- ch.05: overlap ledger + the tension exchange ---------- */
+
+.rf-overlap {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+  margin-top: clamp(2.5rem, 6vh, 3.5rem);
+}
+
+.rf-overlap > div {
+  padding: 1.35rem 1.5rem 1.35rem 0;
+  border-top: 1px solid var(--rf-hair);
+}
+
+.rf-overlap strong {
+  font-family: var(--font-jetbrains-mono);
+  font-size: 0.95rem;
+  font-weight: 400;
+  color: var(--color-paper);
+}
+
+.rf-overlap span {
+  display: block;
+  margin-top: 0.3rem;
+  font-family: var(--font-dm-sans);
+  font-size: 0.9rem;
+  color: var(--color-paper-faint);
+}
+
+/* ---------- ch.05: the architecture diagram ----------
+   Sits at the text measure like any other child of the section — it is not
+   a break-out figure. Its #000 plate takes the same `screen` blend the
+   prism and the ch.04 illustrations use. */
+
+.rf-architecture {
+  margin: clamp(2.5rem, 6vh, 4rem) 0 0;
+  isolation: isolate;
+  background: var(--color-ink);
+}
+
+.rf-architecture img {
+  display: block;
+  width: 100%;
+  height: auto;
+  mix-blend-mode: screen;
+}
+
+/* ---------- the recurring closing conviction ---------- */
+
+.rf-conviction {
+  position: relative;
+  max-width: 24em;
+  margin-top: clamp(3.5rem, 9vh, 6rem);
+  padding-top: 1.75rem;
+  font-family: var(--font-dm-sans);
+  font-size: clamp(1.3rem, 2.1vw, 1.75rem);
+  font-weight: 400;
+  line-height: 1.38;
+  letter-spacing: -0.02em;
+  color: var(--color-paper);
+}
+
+/* the emoji is a colour-font glyph: it ignores the conviction's negative
+   tracking and reads better a touch smaller than the sentence it opens */
+.rf-conviction__mark {
+  font-size: 0.85em;
+  letter-spacing: normal;
+}
+
+/* the spectrum rule is a pseudo-element, not a gradient border-image:
+   a short fixed-width rule reads as a mark, and it renders identically
+   everywhere instead of depending on border-image support */
+.rf-conviction::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 120px;
+  height: 1px;
+  background: var(--rf-spectrum);
+}
+
+/* ---------- ch.08: appendix ----------
+   Two exhibits, built from the page's own parts: a hairline frame, mono for
+   the file metadata, DM Sans for the caption. No new surface colour. */
+
+.rf-appendix {
+  display: grid;
+  gap: clamp(2.5rem, 6vh, 4rem);
+  margin-top: clamp(2.5rem, 6vh, 4rem);
+}
+
+.rf-appendix__item {
+  margin: 0;
+}
+
+.rf-appendix__file {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.rf-appendix__icon {
+  width: 34px;
+  height: 34px;
+  flex: none;
+  color: var(--color-terracotta);
+}
+
+.rf-appendix__name {
+  font-family: var(--font-dm-sans);
+  font-size: 1rem;
+  color: var(--color-paper);
+}
+
+.rf-appendix__meta {
+  margin-top: 0.2rem;
+  font-family: var(--font-jetbrains-mono);
+  font-size: 0.75rem; /* 12px floor */
+  letter-spacing: 0.08em;
+  color: var(--color-paper-faint);
+}
+
+.rf-appendix__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  margin-top: 1.1rem;
+}
+
+.rf-appendix__actions a {
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--rf-hair);
+  font-family: var(--font-jetbrains-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: var(--color-paper-dim);
+  transition: color 300ms var(--ease-settle), border-color 300ms var(--ease-settle);
+}
+
+.rf-appendix__actions a:hover {
+  color: var(--color-terracotta);
+  border-bottom-color: var(--color-terracotta);
+}
+
+.rf-appendix__preview {
+  display: block;
+  width: 100%;
+  height: clamp(340px, 46vh, 520px);
+  margin-top: 1.5rem;
+  border: 1px solid var(--rf-hair);
+  border-radius: 10px;
+  background: var(--color-ink-soft);
+}
+
+/* phones render a blank box rather than an inline PDF, so the actions above
+   carry the whole job there */
+@media (max-width: 767px) {
+  .rf-appendix__preview {
+    display: none;
+  }
+}
+
+.rf-appendix__shot {
+  display: block;
+  overflow: hidden;
+  border: 1px solid var(--rf-hair);
+  border-radius: 10px;
+}
+
+.rf-appendix__shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.rf-appendix__caption {
+  margin-top: 0.9rem;
+  font-family: var(--font-dm-sans);
+  font-size: 0.875rem; /* 14px */
+  font-style: italic;
+  line-height: 1.6;
+  color: var(--color-paper-faint);
+}
+
+/* ---------- ch.07 closing ---------- */
+
+.refract-closing {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* the avatar is 80px, far taller than a line box — so the closing line
+   becomes a flex row (portrait beside the statement) rather than trying to
+   carry an 80px inline element and blowing out its own leading */
+.rf-final {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+  max-width: 26em;
+  margin-top: clamp(3rem, 8vh, 5rem);
+  padding-top: 1.75rem;
+  font-family: var(--font-dm-sans);
+  font-size: clamp(1.2rem, 1.9vw, 1.55rem);
+  line-height: 1.45;
+  letter-spacing: -0.015em;
+  color: var(--color-paper);
+  border-top: 1px solid var(--color-terracotta);
+}
+
+.rf-final__avatar {
+  flex: none;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* on a phone an 80px portrait leaves the statement about 240px to wrap in,
+   which shreds it — so it steps down below 480px */
+@media (max-width: 480px) {
+  .rf-final {
+    gap: 1rem;
+  }
+
+  .rf-final__avatar {
+    width: 56px;
+    height: 56px;
+  }
+}
+
+/* ---------- mobile chapter index ---------- */
+
+.refract-mobile-index {
+  display: none;
+}
+
+/* ---------- scroll reveal ---------- */
+
+[data-refract-reveal] {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 800ms var(--ease-refract), transform 800ms var(--ease-refract);
+}
+
+[data-refract-reveal].is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------- breakpoints ---------- */
+
+@media (max-width: 1023px) {
+  /* below lg the copy runs full-width, so a *fixed* home link sits on top
+     of it as you scroll. Anchor it to the top of the page instead and let
+     it scroll away — the bottom chapter pill is the nav down here. */
+  .refract-home-link {
+    position: absolute;
+  }
+
+  .refract-mobile-index {
+    position: fixed;
+    left: 50%;
+    bottom: 1rem;
+    z-index: 55;
+    display: flex;
+    gap: 0.15rem;
+    padding: 0.35rem;
+    border: 1px solid var(--rf-hair);
+    border-radius: 999px;
+    background: rgba(5, 5, 5, 0.86);
+    backdrop-filter: blur(16px);
+    transform: translateX(-50%);
+  }
+
+  .refract-mobile-index button {
+    width: 1.95rem;
+    height: 1.95rem;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    font-family: var(--font-jetbrains-mono);
+    font-size: 0.75rem; /* 12px floor */
+    color: var(--color-paper-faint);
+  }
+
+  .refract-mobile-index button[aria-current="true"] {
+    background: color-mix(in oklab, var(--color-terracotta) 18%, transparent);
+    color: var(--color-terracotta);
+  }
+}
+
+@media (max-width: 860px) {
+  .refract-page {
+    --rf-rail: 96px;
+    --rf-rail-gap: 1.5rem;
+  }
+
+  .rf-strategy {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .rf-overlap {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 767px) {
+  .refract-page {
+    --rf-rail: 1fr;
+  }
+
+  .refract-home-link {
+    top: 1.4rem;
+  }
+
+  .refract-hero {
+    padding-top: 7.5rem;
+  }
+
+  .rf-row {
+    grid-template-columns: 1fr;
+    gap: 0.9rem;
+    padding-block: 1.6rem;
+  }
+
+  .rf-row__label b {
+    display: inline;
+  }
+
+  .rf-row__label b::before {
+    content: " · ";
+  }
+
+
+  .rf-spec > div {
+    grid-template-columns: 1fr;
+    gap: 0.3rem;
+  }
+
+  .rf-quotes {
+    padding-left: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-refract-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
