@@ -19,7 +19,7 @@ type NodeCopy = {
 export const LAB_NODE_COPY: Record<string, Record<Locale, NodeCopy>> = {
   "dating-ai": {
     en: {
-      label: "Dating AI",
+      label: "Refract Dating AI",
       insight:
         "Every conversation with AI leaves an emotional footprint. What if those footprints could lead you home?",
       status: "Paused after early market validation",
@@ -57,7 +57,7 @@ export const LAB_NODE_COPY: Record<string, Record<Locale, NodeCopy>> = {
       ],
     },
     zh: {
-      label: "约会 AI",
+      label: "Refract 约会 AI",
       insight: "每一次与 AI 的对话，都会留下情感的足迹。如果这些足迹，能带你找到归属呢？",
       status: "早期市场验证后暂停",
       relatedTags: ["情感 AI", "SEMO", "心理学"],

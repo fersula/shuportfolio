@@ -13,7 +13,7 @@ const en = {
     manifesto: "Manifesto",
     intro: "Intro",
     featuredWorks: "Featured Works",
-    refractionLab: "Refraction Lab",
+    refractionLab: "Idea Playground",
     contact: "Contact Me",
   },
   manifesto: {
@@ -75,7 +75,7 @@ const en = {
      *  — so it doesn't need this) */
     connectionCategoryWrap: ["", ""] as [string, string],
     featuredWorkBadge: "Featured Work",
-    refractionTeaserHeading: "Shu's Refraction Lab",
+    refractionTeaserHeading: "Shu's Idea Playground",
     refractionTeaserBody:
       "A living archive of the questions, observations, and experiments shaping how I think, and they are still expanding...",
   },
@@ -106,6 +106,7 @@ const en = {
     detailPanel: {
       status: "Status",
       related: "Related",
+      readThesis: "Read the product thesis",
       close: "Close",
     },
   },
@@ -224,6 +225,7 @@ const zh: typeof en = {
     detailPanel: {
       status: "状态",
       related: "相关",
+      readThesis: "阅读产品论述",
       close: "关闭",
     },
   },

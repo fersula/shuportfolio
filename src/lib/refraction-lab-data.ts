@@ -71,6 +71,10 @@ export type LabNode = {
   depth: Depth;
   /** other node ids this one draws a glowing connection line to on hover */
   relatedIds?: string[];
+  /** optional internal route the detail panel links out to — renders the
+   *  "read the product thesis" button under the Related line. Label comes
+   *  from UI_COPY.refractionLab.detailPanel.readThesis, not from here. */
+  ctaHref?: string;
 
   year: string;
   status: string;
@@ -84,13 +88,14 @@ export type LabNode = {
 export const LAB_NODES: LabNode[] = [
   {
     id: "dating-ai",
-    label: "Dating AI",
+    label: "Refract Dating AI",
     types: ["hypothesis"],
     insight:
       "Every conversation with AI leaves an emotional footprint. What if those footprints could lead you home?",
     position: { x: 78, y: 22 },
     depth: "near",
     relatedIds: ["emotion-ai-future"],
+    ctaHref: "/refract",
 
     year: "2026",
     status: "Paused after early market validation",

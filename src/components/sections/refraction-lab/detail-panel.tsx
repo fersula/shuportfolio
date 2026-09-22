@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { EASE } from "@/lib/motion";
 import { NODE_TYPE_META, type LabNode } from "@/lib/refraction-lab-data";
@@ -156,6 +157,19 @@ export function DetailPanel({ node, onClose }: { node: LabNode | null; onClose: 
                     {nodeCopy!.relatedTags.join(" · ")}
                   </p>
                 </div>
+
+                {node.ctaHref && (
+                  <Link
+                    href={node.ctaHref}
+                    className="mt-6 inline-flex items-center gap-2 rounded-full border px-4 py-2 font-mono text-xs text-paper-dim transition-colors duration-300 hover:text-paper"
+                    style={{
+                      borderColor: `color-mix(in srgb, ${color} 45%, transparent)`,
+                    }}
+                  >
+                    {copy.readThesis}
+                    <span aria-hidden>→</span>
+                  </Link>
+                )}
               </div>
 
               <div className="h-px w-full bg-paper-faint/25" />

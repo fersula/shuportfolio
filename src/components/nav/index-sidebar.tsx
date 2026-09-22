@@ -34,7 +34,7 @@ const ITEMS: (NavItem & { navKey: keyof typeof UI_COPY.en.nav })[] = [
   },
   {
     num: "05",
-    label: "Refraction Lab",
+    label: "Idea Playground",
     id: "refraction-lab",
     trackIds: ["refraction-lab-teaser"],
     navKey: "refractionLab",
