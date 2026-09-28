@@ -57,6 +57,16 @@ export const PROJECTS_COPY: Record<
       subtitle: "创业品牌与上线网站，服务概念与视觉识别",
     },
   },
+  keepsake: {
+    en: {
+      title: "How can the souvenirs we bring home reconnect us to the places and stories they came from?",
+      subtitle: "Exhibition-style prototype for souvenirs and museum goods, curation and e-commerce concept",
+    },
+    zh: {
+      title: "我们从各地带回的纪念品，如何让我们与它们的原乡和背后的故事重新建立连接？",
+      subtitle: "纪念品与博物馆文创的展览式原型，策展与电商概念探索",
+    },
+  },
   metamatsu: {
     en: {
       title:

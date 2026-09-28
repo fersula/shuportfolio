@@ -69,6 +69,16 @@ const PROJECTS: Record<string, ProjectItem & { worktype: WorkType }> = {
     link: "https://chimonart.framer.website/",
     worktype: "Related",
   },
+  keepsake: {
+    id: "keepsake",
+    src: "/thumbnails/keepsake.png",
+    projectName: "Keepsake Atlas",
+    year: "2026",
+    title: "How can the souvenirs we bring home reconnect us to the places and stories they came from?",
+    subtitle: "Exhibition-style prototype for souvenirs and museum goods, curation and e-commerce concept",
+    link: "https://shufu.work/keepsake/",
+    worktype: "Related",
+  },
   metamatsu: {
     id: "metamatsu",
     src: "/thumbnails/metamatsu.png",
@@ -125,7 +135,7 @@ const PROJECTS: Record<string, ProjectItem & { worktype: WorkType }> = {
 // `worktype`.
 const SECTIONS: { category: string; featured: string; related: string[] }[] = [
   { category: "Technology", featured: "auto", related: [] },
-  { category: "Culture&Places", featured: "sere", related: ["chimon", "metamatsu"] },
+  { category: "Culture&Places", featured: "sere", related: ["keepsake", "metamatsu"] },
   { category: "Self", featured: "kado", related: ["semo"] },
   { category: "Others", featured: "elgana", related: ["iverse", "metabond"] },
 ];
